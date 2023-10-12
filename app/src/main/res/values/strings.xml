@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Kézilabda statisztika</string>
+    <string name="new_match">Új mérkőzés</string>
+    <string name="players">Játékosok</string>
+    <string name="matches">Mérkőzések</string>
+    <string name="contact">Kapcsolat</string>
+    <string name="greeting">Üdvözöllek</string>
+    <string name="date">Dátum</string>
+    <string name="opponent">Ellenfél</string>
+    <string name="start">Indítás</string>
+    <string name="yyyy_mm_dd">ÉÉÉÉ-HH-NN</string>
+    <string name="numberOfMatches">Mérkőzések száma: </string>
+    <string name="addPlayerName">Név</string>
+    <string name="addPlayerTeam">Csapat</string>
+    <string name="add">Hozzáadás</string>
+    <string name="addPlayerTitle">Új játékos hozzáadása</string>
+    <string name="addPlayerId">Engedélyszám</string>
+</resources>

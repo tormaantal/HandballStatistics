@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <EditText
+        android:id="@+id/addPlayerIdEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/addPlayerId"
+        android:inputType="number" />
+
+
+    <EditText
+        android:id="@+id/addPlayerNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:autofillHints=""
+        android:hint="@string/addPlayerName"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/addPlayerTeamEditText"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:autofillHints=""
+        android:hint="@string/addPlayerTeam"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/addPlayerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/backGround"
+        android:text="@string/add"
+        android:textColor="@color/white" />
+
+
+</LinearLayout>
