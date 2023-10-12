@@ -15,14 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:text="@string/new_match"
-            android:textSize="20sp" />
-
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,7 +38,7 @@
                 <Spinner
                     android:id="@+id/selectPlayerSpinner"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                    android:layout_height="48dp"
                     android:layout_weight="2"
                     android:layout_marginHorizontal="10dp"/>
             </TableRow>
@@ -68,10 +60,11 @@
                     android:id="@+id/datePickerButton"
                     style="?android:spinnerStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="10dp"
                     android:layout_weight="2"
                     android:hint="@string/yyyy_mm_dd"
-                    android:layout_marginHorizontal="10dp"/>
+                    tools:ignore="TextContrastCheck" />
 
             </TableRow>
 
@@ -91,11 +84,13 @@
                 <EditText
                     android:id="@+id/newMatchOpponentEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="10dp"
                     android:layout_weight="2"
+                    android:autofillHints=""
                     android:ems="10"
                     android:inputType="text"
-                    android:layout_marginHorizontal="10dp"/>
+                    tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
             </TableRow>
         </TableLayout>
@@ -116,7 +111,8 @@
         android:layout_width="225dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/white">
+        android:background="@color/white"
+        tools:ignore="VisualLintBounds">
 
         <include layout="@layout/navigation_drawer" />
 
