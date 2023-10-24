@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RadioButton
+        android:id="@+id/leftWingRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/leftWing"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/leftWingRB"
+        app:layout_constraintStart_toStartOf="@+id/leftWingRB"
+        app:layout_constraintTop_toBottomOf="@+id/leftWingRB" />
+
+
+    <RadioButton
+        android:id="@+id/leftBackRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/pivotRB"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/leftWingRB"
+        app:layout_constraintVertical_bias="0.684" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/leftBack"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/leftBackRB"
+        app:layout_constraintStart_toStartOf="@+id/leftBackRB"
+        app:layout_constraintTop_toBottomOf="@+id/leftBackRB" />
+
+
+    <RadioButton
+        android:id="@+id/pivotRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
+        android:gravity="center"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        app:layout_constraintEnd_toStartOf="@+id/textView"
+        app:layout_constraintHorizontal_bias="0.351"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pivot"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/pivotRB"
+        app:layout_constraintStart_toStartOf="@+id/pivotRB"
+        app:layout_constraintTop_toBottomOf="@+id/pivotRB" />
+
+    <RadioButton
+        android:id="@+id/sevenMetersRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="72dp"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sevenMeters"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/sevenMetersRB"
+        app:layout_constraintStart_toStartOf="@+id/sevenMetersRB"
+        app:layout_constraintTop_toBottomOf="@+id/sevenMetersRB" />
+
+    <RadioButton
+        android:id="@+id/centralBackRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/centralBack"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/centralBackRB"
+        app:layout_constraintStart_toStartOf="@+id/centralBackRB"
+        app:layout_constraintTop_toBottomOf="@+id/centralBackRB" />
+
+    <RadioButton
+        android:id="@+id/rightBackRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/breakInRB"
+        app:layout_constraintTop_toBottomOf="@+id/rightWingRB"
+        app:layout_constraintVertical_bias="0.66999996" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rightBack"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/rightBackRB"
+        app:layout_constraintStart_toStartOf="@+id/rightBackRB"
+        app:layout_constraintTop_toBottomOf="@+id/rightBackRB" />
+
+    <RadioButton
+        android:id="@+id/rightWingRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/leftWingRB" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rightWing"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/rightWingRB"
+        app:layout_constraintStart_toStartOf="@+id/rightWingRB"
+        app:layout_constraintTop_toBottomOf="@+id/rightWingRB" />
+
+    <RadioButton
+        android:id="@+id/breakInRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/textView4"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="@+id/pivotRB" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/breakIn"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/breakInRB"
+        app:layout_constraintStart_toStartOf="@+id/breakInRB"
+        app:layout_constraintTop_toBottomOf="@+id/breakInRB" />
+
+    <RadioButton
+        android:id="@+id/fastBreakRB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:minWidth="20dp"
+        android:minHeight="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/fastBreak"
+        android:textColor="@color/backGround"
+        app:layout_constraintEnd_toEndOf="@+id/fastBreakRB"
+        app:layout_constraintStart_toStartOf="@+id/fastBreakRB"
+        app:layout_constraintTop_toBottomOf="@+id/fastBreakRB" />
+</androidx.constraintlayout.widget.ConstraintLayout>

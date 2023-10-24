@@ -21,9 +21,10 @@
             android:layout_height="100dp">
 
             <TextView
-                android:id="@+id/rvrMatchDate"
-                android:layout_width="217dp"
+                android:id="@+id/rvrMatchPlayerName"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginStart="30dp"
                 android:gravity="center"
                 android:text="TextView"
                 android:textColor="@color/white"
@@ -32,19 +33,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/rvrMatchPlayer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:gravity="center"
-                android:text="TextView"
-                android:textColor="@color/white"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/rvrMatchDate"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintVertical_bias="0.0"  />
 
             <TextView
                 android:id="@+id/rvrMatchOpponent"
@@ -54,9 +43,22 @@
                 android:gravity="center"
                 android:text="TextView"
                 android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/rvrMatchPlayerName"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/rvrStatisticsType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="20dp"
+                android:gravity="center"
+                android:text="TextView"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/rvrMatchDate" />
+                app:layout_constraintStart_toEndOf="@+id/rvrMatchPlayerName" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

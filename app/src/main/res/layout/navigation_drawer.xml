@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/drawer_border"
@@ -17,10 +18,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/baseline_sports_24"
             android:drawablePadding="5dp"
             android:text="@string/new_match"
-            android:textColor="@color/backGround" />
+            android:textColor="@color/backGround"
+            app:drawableLeftCompat="@drawable/baseline_sports_24" />
     </LinearLayout>
 
     <LinearLayout
@@ -34,10 +35,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/baseline_sports_handball_24"
             android:drawablePadding="5dp"
             android:text="@string/players"
-            android:textColor="@color/backGround" />
+            android:textColor="@color/backGround"
+            app:drawableLeftCompat="@drawable/baseline_sports_handball_24" />
     </LinearLayout>
 
     <LinearLayout
@@ -51,10 +52,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/baseline_emoji_events_24"
             android:drawablePadding="5dp"
             android:text="@string/matches"
-            android:textColor="@color/backGround" />
+            android:textColor="@color/backGround"
+            app:drawableLeftCompat="@drawable/baseline_emoji_events_24" />
     </LinearLayout>
 
     <LinearLayout
@@ -68,15 +69,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/baseline_email_24"
             android:drawablePadding="5dp"
             android:text="@string/contact"
-            android:textColor="@color/backGround" />
+            android:textColor="@color/backGround"
+            app:drawableLeftCompat="@drawable/baseline_email_24" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="12dp"
-        android:background="@color/backGround"/>
+        android:background="@color/backGround" />
 </LinearLayout>

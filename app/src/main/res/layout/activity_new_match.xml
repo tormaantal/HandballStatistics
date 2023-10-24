@@ -4,7 +4,7 @@
     android:id="@+id/newMatchDrawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".NewMatchActivity">
+    tools:context=".activities.NewMatchActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,11 +36,11 @@
                     android:textStyle="bold" />
 
                 <Spinner
-                    android:id="@+id/selectPlayerSpinner"
+                    android:id="@+id/playerSpinner"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_weight="2"
-                    android:layout_marginHorizontal="10dp"/>
+                    android:layout_marginHorizontal="10dp" />
             </TableRow>
 
             <TableRow
@@ -57,15 +57,14 @@
                     android:textStyle="bold" />
 
                 <Button
-                    android:id="@+id/datePickerButton"
+                    android:id="@+id/datePicker"
                     style="?android:spinnerStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_marginHorizontal="10dp"
                     android:layout_weight="2"
                     android:hint="@string/yyyy_mm_dd"
-                    tools:ignore="TextContrastCheck" />
-
+                    android:textColorHint="@color/black"/>
             </TableRow>
 
             <TableRow
@@ -81,22 +80,30 @@
                     android:textColor="@color/backGround"
                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/newMatchOpponentEditText"
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilOpponent"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_weight="2"
-                    android:autofillHints=""
-                    android:ems="10"
-                    android:inputType="text"
-                    tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <EditText
+                        android:id="@+id/etOpponent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:autofillHints=""
+                        android:inputType="text"
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
 
             </TableRow>
         </TableLayout>
 
         <Button
-            android:id="@+id/newMatchButton"
+            android:id="@+id/startButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -104,8 +111,8 @@
             android:backgroundTint="@color/backGround"
             android:text="@string/start" />
 
-
     </LinearLayout>
+
 
     <RelativeLayout
         android:layout_width="225dp"

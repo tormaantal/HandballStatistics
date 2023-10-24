@@ -1,14 +1,20 @@
-package hu.szakdolgozat.handballstatistics;
+package hu.szakdolgozat.handballstatistics.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import hu.szakdolgozat.handballstatistics.R;
+import hu.szakdolgozat.handballstatistics.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 //        A toolbaron-n lévő ikon és a menü opciók
 //        megnyomásának figyelése, kezelése.
         menu.setOnClickListener(view -> {
-            openDrawer(mainDrawerLayout);
+            mainDrawerLayout.openDrawer(GravityCompat.START);
         });
         newMatch.setOnClickListener(view -> {
             openActivity(NewMatchActivity.class);
@@ -47,23 +53,11 @@ public class MainActivity extends AppCompatActivity {
 //    Változók azonosítása
     private void initMainActivity() {
         mainDrawerLayout = findViewById(R.id.mainDrawerLayout);
-        menu = findViewById(R.id.menu);
+        menu = findViewById(R.id.menuImageView);
         newMatch = findViewById(R.id.newMatch);
         players = findViewById(R.id.players);
         matches = findViewById(R.id.matches);
         contact = findViewById(R.id.contact);
-    }
-
-    //    Menü megjelenítése
-    public static void openDrawer(DrawerLayout drawerLayout) {
-        drawerLayout.openDrawer(GravityCompat.START);
-    }
-
-//    Menü bezárása
-    public static void closeDrawer(DrawerLayout drawerLayout) {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
     }
 
 //    Email küldése a saját email címemre, email küldésre
@@ -82,13 +76,35 @@ public class MainActivity extends AppCompatActivity {
     public void openActivity(Class secondActivity) {
         Intent intent = new Intent(this, secondActivity);
         startActivity(intent);
-        finish();
     }
+
 
 //    Ha onPause meghívódik, akkor zárja be a menüt.
     @Override
     protected void onPause() {
+        if (mainDrawerLayout.isDrawerOpen(GravityCompat.START)){
+            mainDrawerLayout.closeDrawer(GravityCompat.START);
+        }
         super.onPause();
-        closeDrawer(mainDrawerLayout);
+    }
+
+//    Kilépés megerősítése
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.exit)
+                .setMessage(R.string.exitMsg)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        MainActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).show();
     }
 }

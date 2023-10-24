@@ -2,33 +2,52 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="5dp">
 
 
-    <EditText
-        android:id="@+id/addPlayerIdEditText"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPlayerId"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/addPlayerId"
-        android:inputType="number" />
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etPlayerId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/addPlayerId"
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 
-    <EditText
-        android:id="@+id/addPlayerNameEditText"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPlayerName"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:autofillHints=""
-        android:hint="@string/addPlayerName"
-        android:inputType="text" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/addPlayerTeamEditText"
+        <EditText
+            android:id="@+id/etPlayerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/addPlayerName"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPlayerTeam"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:autofillHints=""
-        android:hint="@string/addPlayerTeam"
-        android:inputType="text" />
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etPlayerTeam"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/addPlayerTeam"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/addPlayerButton"

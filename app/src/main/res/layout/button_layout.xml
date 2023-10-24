@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="4"
+    android:paddingTop="5dp"
+    style="?android:attr/buttonBarStyle">
+
+    <Button
+        android:id="@+id/button"
+        android:layout_weight="1"
+        android:backgroundTint="@color/backGround"
+        android:layout_margin="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/yellowCard"
+        android:textColor="@color/white"
+        style="?android:attr/buttonBarButtonStyle" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/backGround"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/twoMinutes"
+        android:textColor="@color/white"
+        style="?android:attr/buttonBarButtonStyle" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/backGround"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/redCard"
+        android:textColor="@color/white"
+        style="?android:attr/buttonBarButtonStyle" />
+
+    <Button
+        android:id="@+id/blu"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/backGround"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/blueCard"
+        android:textColor="@color/white"
+        style="?android:attr/buttonBarButtonStyle" />
+</LinearLayout>

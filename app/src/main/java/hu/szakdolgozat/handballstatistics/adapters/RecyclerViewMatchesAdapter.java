@@ -1,4 +1,4 @@
-package hu.szakdolgozat.handballstatistics;
+package hu.szakdolgozat.handballstatistics.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,15 +11,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import hu.szakdolgozat.handballstatistics.pojo.Match;
+import hu.szakdolgozat.handballstatistics.R;
+import hu.szakdolgozat.handballstatistics.RecyclerViewInterface;
+import hu.szakdolgozat.handballstatistics.models.Match;
 
 public class RecyclerViewMatchesAdapter extends RecyclerView.Adapter<RecyclerViewMatchesAdapter.matchesViewHolder> {
+    private final RecyclerViewInterface recyclerViewInterface;
     Context context;
     ArrayList<Match> matches;
 
-    public RecyclerViewMatchesAdapter(Context context, ArrayList<Match> matches) {
+    public RecyclerViewMatchesAdapter(Context context, ArrayList<Match> matches, RecyclerViewInterface recyclerViewInterface) {
         this.context = context;
         this.matches = matches;
+        this.recyclerViewInterface =recyclerViewInterface;
     }
 
     @NonNull
@@ -32,7 +36,7 @@ public class RecyclerViewMatchesAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewMatchesAdapter.matchesViewHolder holder, int position) {
-        holder.rvrMatchDate.setText(matches.get(position).getDate().toString());
+        holder.rvrMatchDate.setText(matches.get(position).getDate());
         holder.rvrMatchPlayer.setText(String.valueOf(matches.get(position).getPlayerId()));
         holder.rvrMatchOpponent.setText(matches.get(position).getOpponent());
     }
@@ -47,9 +51,9 @@ public class RecyclerViewMatchesAdapter extends RecyclerView.Adapter<RecyclerVie
         TextView rvrMatchDate,rvrMatchPlayer,rvrMatchOpponent;
         public matchesViewHolder(@NonNull View itemView) {
             super(itemView);
-            rvrMatchDate = itemView.findViewById(R.id.rvrMatchDate);
-            rvrMatchPlayer = itemView.findViewById(R.id.rvrMatchPlayer);
-            rvrMatchOpponent = itemView.findViewById(R.id.rvrMatchOpponent);
+            rvrMatchDate = itemView.findViewById(R.id.rvrMatchPlayerName);
+            rvrMatchPlayer = itemView.findViewById(R.id.rvrMatchOpponent);
+            rvrMatchOpponent = itemView.findViewById(R.id.rvrStatisticsType);
 
         }
     }

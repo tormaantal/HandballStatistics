@@ -1,4 +1,4 @@
-package hu.szakdolgozat.handballstatistics.pojo;
+package hu.szakdolgozat.handballstatistics.models;
 
 public enum EventType {
     LEFTWING,

@@ -1,21 +1,20 @@
-package hu.szakdolgozat.handballstatistics.pojo;
+package hu.szakdolgozat.handballstatistics.models;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Match {
     private int matchId;
     private int playerId;
     private String opponent;
     private String date;
-    private ArrayList<Event> eventsList;
+    private ArrayList<Event> eventList;
 
     public Match(int matchId, int playerId, String opponent, String date) {
         this.matchId = matchId;
         this.playerId = playerId;
         this.opponent = opponent;
         this.date = date;
-        this.eventsList = new ArrayList<>();
+        this.eventList = new ArrayList<>();
     }
 
     public int getMatchId() {
@@ -50,11 +49,11 @@ public class Match {
         this.date = date;
     }
 
-    public ArrayList<Event> getEventsList() {
-        return eventsList;
+    public ArrayList<Event> getEventList() {
+        return eventList;
     }
 
-    public void setEventsList(ArrayList<Event> eventsList) {
-        this.eventsList = eventsList;
+    public void setEventList(ArrayList<Event> eventList) {
+        this.eventList = eventList;
     }
 }
