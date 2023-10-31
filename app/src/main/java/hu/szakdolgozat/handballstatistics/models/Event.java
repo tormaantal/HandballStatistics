@@ -1,13 +1,13 @@
 package hu.szakdolgozat.handballstatistics.models;
 
 public class Event {
-    private final int eventId;
-    private final int matchId;
-    private final int time;
+    private final long eventId;
+    private final long matchId;
+    private final String time;
     private final EventType type;
-    private final Boolean result;
+    private final int result;
 
-    public Event(int eventId, int matchId, int time, EventType type, Boolean result) {
+    public Event(long eventId, long matchId, String time, EventType type, int result) {
         this.eventId = eventId;
         this.matchId = matchId;
         this.time = time;
@@ -15,11 +15,11 @@ public class Event {
         this.result = result;
     }
 
-    public int getEventId() {
+    public long getEventId() {
         return eventId;
     }
 
-    public int getTime() {
+    public String  getTime() {
         return time;
     }
 
@@ -27,11 +27,22 @@ public class Event {
         return type;
     }
 
-    public Boolean getResult() {
+    public int getResult() {
         return result;
     }
 
-    public int getMatchId() {
+    public long getMatchId() {
         return matchId;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventId=" + eventId +
+                ", matchId=" + matchId +
+                ", time='" + time + '\'' +
+                ", type=" + type +
+                ", result=" + result +
+                '}';
     }
 }

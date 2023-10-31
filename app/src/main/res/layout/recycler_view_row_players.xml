@@ -23,7 +23,7 @@
             android:layout_height="100dp">
 
             <TextView
-                android:id="@+id/rvrStatisticsName"
+                android:id="@+id/rvrPlayerName"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="30dp"
@@ -38,7 +38,7 @@
                 app:layout_constraintVertical_bias="0.0" />
 
             <TextView
-                android:id="@+id/rvrStatisticsTime"
+                android:id="@+id/rvrPlayerTeam"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="20dp"
@@ -46,11 +46,11 @@
                 android:text="TextView"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/rvrStatisticsName"
+                app:layout_constraintStart_toEndOf="@+id/rvrPlayerName"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/rvrStatisticsType"
+                android:id="@+id/rvrPlayerId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="20dp"
@@ -59,7 +59,7 @@
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/rvrStatisticsName" />
+                app:layout_constraintStart_toEndOf="@+id/rvrPlayerName" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

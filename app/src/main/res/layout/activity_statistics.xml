@@ -572,16 +572,6 @@
                     android:layout_weight="5"
                     android:gravity="center_horizontal"
                     android:padding="5sp"
-                    android:text="@string/longPass"
-                    android:textColor="@color/white"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:gravity="center_horizontal"
-                    android:padding="5sp"
                     android:text="@string/twoMinutes"
                     android:textColor="@color/white"
                     android:textSize="14sp" />

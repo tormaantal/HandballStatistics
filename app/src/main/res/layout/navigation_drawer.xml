@@ -4,76 +4,52 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/drawer_border"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/navigationDrawer">
 
-
-    <LinearLayout
-        android:id="@+id/newMatch"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tvNewMatch"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:orientation="horizontal">
+        android:drawablePadding="5dp"
+        android:text="@string/new_match"
+        android:textColor="@color/backGround"
+        app:drawableLeftCompat="@drawable/baseline_sports_24" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawablePadding="5dp"
-            android:text="@string/new_match"
-            android:textColor="@color/backGround"
-            app:drawableLeftCompat="@drawable/baseline_sports_24" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/players"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tvPlayers"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:orientation="horizontal">
+        android:drawablePadding="5dp"
+        android:text="@string/players"
+        android:textColor="@color/backGround"
+        app:drawableLeftCompat="@drawable/baseline_sports_handball_24" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawablePadding="5dp"
-            android:text="@string/players"
-            android:textColor="@color/backGround"
-            app:drawableLeftCompat="@drawable/baseline_sports_handball_24" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/matches"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tvMatches"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:orientation="horizontal">
+        android:drawablePadding="5dp"
+        android:text="@string/matches"
+        android:textColor="@color/backGround"
+        app:drawableLeftCompat="@drawable/baseline_emoji_events_24" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawablePadding="5dp"
-            android:text="@string/matches"
-            android:textColor="@color/backGround"
-            app:drawableLeftCompat="@drawable/baseline_emoji_events_24" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/contact"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tvContact"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawablePadding="5dp"
-            android:text="@string/contact"
-            android:textColor="@color/backGround"
-            app:drawableLeftCompat="@drawable/baseline_email_24" />
-    </LinearLayout>
+        android:drawablePadding="5dp"
+        android:text="@string/contact"
+        android:textColor="@color/backGround"
+        app:drawableLeftCompat="@drawable/baseline_email_24" />
 
     <View
         android:layout_width="match_parent"

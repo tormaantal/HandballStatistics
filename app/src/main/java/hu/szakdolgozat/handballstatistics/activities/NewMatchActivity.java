@@ -1,6 +1,7 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,32 +20,28 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import hu.szakdolgozat.handballstatistics.database.DatabaseHelper;
 import hu.szakdolgozat.handballstatistics.R;
-import hu.szakdolgozat.handballstatistics.models.Player;
+import hu.szakdolgozat.handballstatistics.services.MatchServices;
+import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class NewMatchActivity extends AppCompatActivity {
 
-    //    Szükséges változók deklarálása
-    DatabaseHelper db;
-    TextView toolbarTV;
+    MatchServices matchServices;
+    PlayerServices playerServices;
+    TextView toolbarTV, tvPlayers, tvMatches, tvContact;
+    Button startButton, dateButton;
     DrawerLayout newMatchDrawerLayout;
+    LinearLayout navigationDrawer;
     ImageView menuImageView;
-    LinearLayout newMatchLinearLayout, playersLinearLayout, matchesLinearLayout, contactLinearLayout;
-    Button startButton, datePicker;
     Spinner playerSpinner;
     EditText etOpponent;
     TextInputLayout tilOpponent;
-    int playerId;
-    String date, opponent;
-
-    ArrayList<Player> playersList;
+    long playerId, matchId;
+    StringBuilder date;
+    String opponent;
     ArrayList<String> adapterList;
     ArrayAdapter<String> spinnerAdapter;
 
@@ -52,153 +49,129 @@ public class NewMatchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_match);
-
-//        Változók inicializálása
-        initNewMatchActivity();
-
-//        A toolbaron-n lévő ikon és a menü opciók
-//        megnyomásának figyelése, kezelése.
+        init();
+        initSpinner();
+        navigationDrawer.setOnClickListener(view -> {
+        });
         menuImageView.setOnClickListener(view -> {
             newMatchDrawerLayout.openDrawer(GravityCompat.START);
         });
-        playersLinearLayout.setOnClickListener(view -> {
+        tvPlayers.setOnClickListener(view -> {
             openActivity(PlayersActivity.class);
             finish();
         });
-        matchesLinearLayout.setOnClickListener(view -> {
+        tvMatches.setOnClickListener(view -> {
             openActivity(MatchesActivity.class);
             finish();
         });
-        contactLinearLayout.setOnClickListener(view -> {
+        tvContact.setOnClickListener(view -> {
             sendEmail();
         });
-
-//      Játékos kiválasztásához használt
-//      legördülő menü kezelése.
-/*        playerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                String text = adapterView.getItemAtPosition(position).toString();
-                //Todo kiválasztott játékos ID eltárolása.
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });*/
-
-//        Dátum kiváláasztásához dialógus megjelenítése.
-        datePicker.setOnClickListener(view -> {
-            try {
-                showDatePickerDialog();
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+        dateButton.setOnClickListener(view -> {
+            showDatePickerDialog();
         });
-
-//        Mérkőzés elindítása
         startButton.setOnClickListener(view -> {
-            if (playerSpinner.getSelectedItemPosition() == 0) {
-                Toast.makeText(this, "Válassz ki egy játékost!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (date == null) {
-                Toast.makeText(this, "Válassz ki időpontot!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (etOpponent.getText().toString().isEmpty()) {
-                tilOpponent.setError("Nem lehet üres!");
-                return;
-            }
-            playerId = playersList.get(playerSpinner.getSelectedItemPosition() - 1).getId();
-            opponent = etOpponent.getText().toString().trim();
-            Intent intent = new Intent(this, StartedMatchActivity.class);
-            intent.putExtra("id", playerId);
-            intent.putExtra("date", date);
-            intent.putExtra("opponent", opponent);
-            startActivity(intent);
+            startButtonAction();
         });
     }
 
-    //    Változók azonosítása, toolbar cím változtatása,
-//    játékos spinner feltöltése és adapter beállítása
-    private void initNewMatchActivity() {
-        db = new DatabaseHelper(this);
-        toolbarTV = findViewById(R.id.toolbarTV);
+    private void init() {
+        matchServices = new MatchServices(this);
+        playerServices = new PlayerServices(this);
+        toolbarTV = findViewById(R.id.tvToolbar);
         toolbarTV.setText(R.string.new_match);
+        navigationDrawer = findViewById(R.id.navigationDrawer);
         newMatchDrawerLayout = findViewById(R.id.newMatchDrawerLayout);
         menuImageView = findViewById(R.id.menuImageView);
-        newMatchLinearLayout = findViewById(R.id.newMatch);
-        playersLinearLayout = findViewById(R.id.players);
-        matchesLinearLayout = findViewById(R.id.matches);
-        contactLinearLayout = findViewById(R.id.contact);
+        tvPlayers = findViewById(R.id.tvPlayers);
+        tvMatches = findViewById(R.id.tvMatches);
+        tvContact = findViewById(R.id.tvContact);
         tilOpponent = findViewById(R.id.tilOpponent);
         etOpponent = findViewById(R.id.etOpponent);
         startButton = findViewById(R.id.startButton);
         playerSpinner = findViewById(R.id.playerSpinner);
-        datePicker = findViewById(R.id.datePicker);
-        playersList = new ArrayList<>();
+        dateButton = findViewById(R.id.dateButton);
+    }
+
+    public void initSpinner() {
         adapterList = new ArrayList<>();
-        readAllPlayers();
+        adapterList.add("Válassz egy játékost!");
+        playerServices.findAllPlayer().forEach(player -> adapterList.add(player.getName() + " (" + player.getId() + ")"));
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, adapterList);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         playerSpinner.setAdapter(spinnerAdapter);
     }
 
-    public void readAllPlayers() {
-        adapterList.add("Válassz egy játékost!");
-        playersList.addAll(db.selectAllPlayer());
-        if (!playersList.isEmpty()) {
-            playersList.forEach(player -> {
-                adapterList.add(player.getName() + " (" + player.getId() + ")");
-            });
+    private void startButtonAction() {
+        if (playerSpinner.getSelectedItemPosition() == 0) {
+            Toast.makeText(this, "Válassz ki egy játékost!", Toast.LENGTH_SHORT).show();
+            return;
         }
+        if (date == null) {
+            Toast.makeText(this, "Válassz ki időpontot!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (etOpponent.getText().toString().isEmpty()) {
+            tilOpponent.setError("Nem lehet üres!");
+            return;
+        }
+        playerId = playerServices.findAllPlayer().get(playerSpinner.getSelectedItemPosition() - 1).getId();
+        opponent = etOpponent.getText().toString().trim();
+        matchId = matchServices.addMatch(playerId, date.toString(), opponent);
+        if (matchId > 0) {
+            Intent intent = new Intent(this, StartedMatchActivity.class);
+            intent.putExtra("playerId", playerId);
+            intent.putExtra("date", date.toString());
+            intent.putExtra("opponent", opponent);
+            intent.putExtra("matchId", matchId);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Nem jött létre a mérkőzés!", Toast.LENGTH_SHORT).show();
+        }
+        finish();
     }
 
-    //    Dátum kiválasztása, formázása és eltárolása
-    private void showDatePickerDialog() throws ParseException {
+    private void showDatePickerDialog() {
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (datePicker, newYear, newMonth, newDay) ->
-        {
-            String dateInString = year + "-" + month + "-" + dayOfMonth;
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            try {
-                formatter.parse(dateInString);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
-            this.datePicker.setHint(dateInString);
-            //Todo kiválasztott dátum eltárolása
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        new DatePickerDialog(this, (datePicker, selectedYear, selectedMonth, selectedDay) -> {
 
-        }, year, month, dayOfMonth);
-        date = year + "-" + month + "-" + dayOfMonth;
-        datePickerDialog.show();
+            date = new StringBuilder();
+            date.append(selectedYear);
+            if (selectedMonth+1 < 10) {
+                date.append("." + 0).append(selectedMonth+1);
+            } else {
+                date.append(".").append(selectedMonth+1);
+            }
+            if (selectedDay < 10) {
+                date.append("." + 0).append(selectedDay);
+            } else {
+                date.append(".").append(selectedDay);
+            }
+            dateButton.setHint(date);
+        }, year, month, dayOfMonth).show();
+
     }
 
-    //    Email küldése a saját email címemre, email küldésre
-//    képes alkalmazások kiválasztási lehetőséggel.
     private void sendEmail() {
         String[] to = {"t.anti94@gmail.com"};
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, to);
-        if (intent.resolveActivity(getPackageManager()) != null) {
+        try {
             startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
         }
     }
 
-    //    Egy másik Activity megnyitása.
-    public void openActivity(Class secondActivity) {
+    public void openActivity(Class<?> secondActivity) {
         Intent intent = new Intent(this, secondActivity);
         startActivity(intent);
     }
 
-    //    Ha onPause meghívódik, akkor zárja be a menüt.
     @Override
     protected void onPause() {
         if (newMatchDrawerLayout.isDrawerOpen(GravityCompat.START)) {

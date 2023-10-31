@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="150dp">
+    android:layout_height="150dp"
+    android:id="@+id/tgsel">
 
     <LinearLayout
         android:layout_width="409dp"
@@ -14,18 +15,23 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <NumberPicker
-            android:id="@+id/minutesNumberPicker"
+            android:id="@+id/npMinutes"
             android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp" />
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"/>
 
-        <NumberPicker
-            android:id="@+id/secondNumberPicker"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:text="@string/minutes" />
 
         <ImageView
-            android:id="@+id/addSaveButton"
+            android:id="@+id/addSave"
             android:layout_width="90dp"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
@@ -33,14 +39,14 @@
             app:srcCompat="@drawable/baseline_front_hand_24" />
 
         <ImageView
-            android:id="@+id/addGoalButton"
+            android:id="@+id/addGoal"
             android:layout_width="90dp"
             android:layout_height="match_parent"
             android:contentDescription="@string/gaols"
             android:src="@drawable/handball" />
 
         <Button
-            android:id="@+id/endMatchButton"
+            android:id="@+id/endMatch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

@@ -57,14 +57,15 @@
                     android:textStyle="bold" />
 
                 <Button
-                    android:id="@+id/datePicker"
-                    style="?android:spinnerStyle"
+                    android:id="@+id/dateButton"
+                    style="?android:datePickerDialogTheme"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_marginHorizontal="10dp"
                     android:layout_weight="2"
                     android:hint="@string/yyyy_mm_dd"
-                    android:textColorHint="@color/black"/>
+                    android:backgroundTint="@color/backGround"
+                    android:textColorHint="@color/white"/>
             </TableRow>
 
             <TableRow

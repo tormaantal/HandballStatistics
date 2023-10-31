@@ -1,59 +1,42 @@
 package hu.szakdolgozat.handballstatistics.models;
 
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
 
 public class Match {
-    private int matchId;
-    private int playerId;
-    private String opponent;
-    private String date;
-    private ArrayList<Event> eventList;
+    private final long matchId;
+    private final long playerId;
+    private final String opponent;
+    private final String date;
 
-    public Match(int matchId, int playerId, String opponent, String date) {
+    public Match(long matchId, long playerId, String date, String opponent) {
         this.matchId = matchId;
         this.playerId = playerId;
         this.opponent = opponent;
         this.date = date;
-        this.eventList = new ArrayList<>();
     }
 
-    public int getMatchId() {
+    public long getMatchId() {
         return matchId;
     }
 
-    public void setMatchId(int matchId) {
-        this.matchId = matchId;
-    }
-
-    public int getPlayerId() {
+    public long getPlayerId() {
         return playerId;
-    }
-
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
     }
 
     public String getOpponent() {
         return opponent;
     }
 
-    public void setOpponent(String opponent) {
-        this.opponent = opponent;
-    }
-
     public String getDate() {
         return date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public ArrayList<Event> getEventList() {
-        return eventList;
-    }
-
-    public void setEventList(ArrayList<Event> eventList) {
-        this.eventList = eventList;
+    @NonNull
+    @Override
+    public String toString() {
+        return matchId +
+                " = " + playerId +
+                " = " + opponent +
+                " = " + date;
     }
 }

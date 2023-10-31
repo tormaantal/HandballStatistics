@@ -10,7 +10,6 @@ public enum EventType {
     PIVOT,
     SEVENMETERS,
     FASTBREAK,
-    LONGPASS,
     TWOMINUTES,
     YELLOWCARD,
     REDCARD,

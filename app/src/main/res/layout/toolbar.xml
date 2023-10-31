@@ -19,7 +19,7 @@
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/toolbarTV"
+        android:id="@+id/tvToolbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
@@ -33,7 +33,7 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/addImageView"
+            android:id="@+id/create"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_add_24"

@@ -1,5 +1,6 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,96 +21,69 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
-
-import hu.szakdolgozat.handballstatistics.database.DatabaseHelper;
 import hu.szakdolgozat.handballstatistics.R;
 import hu.szakdolgozat.handballstatistics.RecyclerViewInterface;
 import hu.szakdolgozat.handballstatistics.adapters.RecyclerViewPlayersAdapter;
-import hu.szakdolgozat.handballstatistics.models.Player;
+import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class PlayersActivity extends AppCompatActivity implements RecyclerViewInterface {
-
-    //    Szükséges változók deklarálása
-    TextView toolbarTV;
+    PlayerServices playerServices;
     DrawerLayout playersDrawerLayout;
+    LinearLayout navigationDrawer;
     ImageView menuImageView, addPlayerImageView;
-    LinearLayout newMatchLinearLayout, playersLinearLayout, matchesLinearLayout, contactLinearLayout;
-    RecyclerView playersRecyclerView;
+    TextView tvToolbar,tvNewMatch, tvMatches, tvContact;
     TextInputLayout tilPlayerId, tilPlayerName, tilPlayerTeam;
     EditText etPlayerId, etPlayerName, etPlayerTeam;
-    AlertDialog dialog;
     Button addPlayerButton;
-    ArrayList<Player> playersList;
+    AlertDialog dialog;
+    RecyclerView playersRecyclerView;
     RecyclerViewPlayersAdapter adapter;
-    DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_players);
-
-//        Változók inicializálása
-        initPlayersActivity();
-
-//        A toolbaron-n lévő ikon és a menü opciók
-//        megnyomásának figyelése, kezelése.
+        init();
+        navigationDrawer.setOnClickListener(view -> {});
         menuImageView.setOnClickListener(view -> {
             playersDrawerLayout.openDrawer(GravityCompat.START);
         });
-        newMatchLinearLayout.setOnClickListener(view -> {
+        tvNewMatch.setOnClickListener(view -> {
             openActivity(NewMatchActivity.class);
             finish();
         });
-        matchesLinearLayout.setOnClickListener(view -> {
+        tvMatches.setOnClickListener(view -> {
             openActivity(MatchesActivity.class);
             finish();
         });
-        contactLinearLayout.setOnClickListener(view -> {
+        tvContact.setOnClickListener(view -> {
             sendEmail();
         });
-//        A hozzadás gomb figyelése, dialógus kinézetének beállítása
-//        és megjelenítése, a hozzáadást lekezelő függvény meghívása.
         addPlayerImageView.setOnClickListener(view -> {
-            addPlayer();
+            addPlayerAction();
         });
 
     }
 
-    //    Változók azonosítása, toolbar cím változtatása,
-//    hozzáadás gomb megjelenítése, Játékosok feltöltése az adapterbe.
-
-    private void initPlayersActivity() {
-        db = new DatabaseHelper(this);
-        toolbarTV = findViewById(R.id.toolbarTV);
-        toolbarTV.setText(R.string.players);
+    private void init() {
+        playerServices = new PlayerServices(this);
+        tvToolbar = findViewById(R.id.tvToolbar);
+        tvToolbar.setText(R.string.players);
+        navigationDrawer = findViewById(R.id.navigationDrawer);
         playersDrawerLayout = findViewById(R.id.playersDrawerLayout);
         menuImageView = findViewById(R.id.menuImageView);
-        addPlayerImageView = findViewById(R.id.addImageView);
-        newMatchLinearLayout = findViewById(R.id.newMatch);
-        playersLinearLayout = findViewById(R.id.players);
-        matchesLinearLayout = findViewById(R.id.matches);
-        contactLinearLayout = findViewById(R.id.contact);
+        addPlayerImageView = findViewById(R.id.create);
+        tvNewMatch = findViewById(R.id.tvNewMatch);
+        tvMatches = findViewById(R.id.tvMatches);
+        tvContact = findViewById(R.id.tvContact);
         playersRecyclerView = findViewById(R.id.playersRecyclerView);
         addPlayerImageView.setVisibility(View.VISIBLE);
-        playersList = new ArrayList<>();
-        readAllPlayers();
-        adapter = new RecyclerViewPlayersAdapter(this, playersList, this);
+        adapter = new RecyclerViewPlayersAdapter(this, playerServices.findAllPlayer(), this);
         playersRecyclerView.setAdapter(adapter);
         playersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    public void readAllPlayers() {
-        playersList.addAll(db.selectAllPlayer());
-        if (playersList.isEmpty()) {
-            Toast.makeText(this, R.string.emptyDB, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    //    Beviteli mezők értékeivel létrehoz egy játékost és a
-//    hozzáadás gomb megnyomásával az adatbázishoz adja.
-    private void addPlayer() {
+    private void addPlayerAction() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.addPlayerTitle);
         View view1 = getLayoutInflater().inflate(R.layout.add_player_dialog, null);
@@ -144,8 +118,12 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
                 tilPlayerId.setError(null);
                 id = Integer.parseInt(etPlayerId.getText().toString().trim());
                 if (!name.isEmpty() && !team.isEmpty()) {
-                    if (db.selectPlayerById(id) == null) {
-                        db.addPlayer(new Player(id, name, team));
+                    if (playerServices.findPlayerById(id) == null) {
+                        if (playerServices.addPlayer(id, name, team) == -1) {
+                            Toast.makeText(this, "Hiba történt!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Játékos létrehozva!", Toast.LENGTH_SHORT).show();
+                        }
                         dialog.dismiss();
                         recreate();
                     } else {
@@ -156,26 +134,23 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
         });
     }
 
-    //    Email küldése a saját email címemre, email küldésre
-//    képes alkalmazások kiválasztási lehetőséggel.
     private void sendEmail() {
         String[] to = {"t.anti94@gmail.com"};
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, to);
-        if (intent.resolveActivity(getPackageManager()) != null) {
+        try {
             startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
         }
     }
 
-    //    Egy másik Activity megnyitása.
-    public void openActivity(Class secondActivity) {
+    public void openActivity(Class<?> secondActivity) {
         Intent intent = new Intent(this, secondActivity);
         startActivity(intent);
     }
 
-    //    Ha onPause meghívódik és
-//    nyitva van a menü akkor zárja be
     @Override
     protected void onPause() {
         if (playersDrawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -187,13 +162,11 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
     @Override
     public void onItemClick(int position) {
         Intent intent = new Intent(this, StatisticsActivity.class);
-        intent.putExtra("type", "player");
-        intent.putExtra("id", playersList.get(position).getId());
+        intent.putExtra("type", "playerId");
+        intent.putExtra("id", playerServices.findAllPlayer().get(position).getId());
         startActivity(intent);
     }
 
-    //    Ha hosszan nyomunk rá az egyik játékosra
-//    akkor törli egy újboli megerősítés után.
     @Override
     public void onItemLongClick(int position) {
         new android.app.AlertDialog.Builder(this)
@@ -201,7 +174,11 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
                 .setMessage(R.string.removePlayer)
                 .setIcon(R.drawable.baseline_delete_24)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                    db.deletePlayer(playersList.get(position).getId());
+                    if (playerServices.deletePlayer(playerServices.findAllPlayer().get(position).getId()) == -1) {
+                        Toast.makeText(this, "Hiba a törlés során!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Játékos törölve!", Toast.LENGTH_SHORT).show();
+                    }
                     adapter.notifyItemRemoved(position);
                     recreate();
                 })

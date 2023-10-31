@@ -8,7 +8,9 @@
     tools:context=".activities.StartedMatchActivity">
 
 
-    <include layout="@layout/time_goal_save_end_layout" />
+    <include layout="@layout/time_goal_save_end_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent" />
 
     <View
         android:layout_width="match_parent"

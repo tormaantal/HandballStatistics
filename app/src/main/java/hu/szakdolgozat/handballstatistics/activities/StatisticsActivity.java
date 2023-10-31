@@ -1,8 +1,10 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,13 +16,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Objects;
 
-import hu.szakdolgozat.handballstatistics.database.DatabaseHelper;
 import hu.szakdolgozat.handballstatistics.R;
+import hu.szakdolgozat.handballstatistics.models.Match;
+import hu.szakdolgozat.handballstatistics.services.MatchServices;
+import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class StatisticsActivity extends AppCompatActivity {
 
-    DatabaseHelper db;
-    int id;
+    PlayerServices playerServices;
+    MatchServices matchServices;
+    long id;
     ImageView statisticsBackIV;
     Button statisticsExportButton;
     TextView staticsDetailsTV, leftWingSaves, leftWingGoals, leftWingEfficiency,
@@ -40,8 +45,8 @@ public class StatisticsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
-        initStatisticsActivity();
-        loadstatistics();
+        init();
+        loadStatistics();
 
 
         statisticsBackIV.setOnClickListener(view -> {
@@ -71,36 +76,43 @@ public class StatisticsActivity extends AppCompatActivity {
         });
     }
 
-    private void initStatisticsActivity() {
-        db = new DatabaseHelper(this);
+    private void init() {
+        playerServices = new PlayerServices(this);
+        matchServices= new MatchServices(this);
         statisticsBackIV = findViewById(R.id.statisticsBackIV);
         staticsDetailsTV = findViewById(R.id.staticsDetailsTV);
         statisticsExportButton = findViewById(R.id.statisticsExportButton);
     }
 
-    private void loadstatistics() {
+    private void loadStatistics() {
         String type = getIntent().getStringExtra("type");
         if (Objects.equals(type, "player")) {
-            id = getIntent().getIntExtra("id", 0);
-            staticsDetailsTV.setText(db.selectPlayerById(id).toString());
+            id = getIntent().getLongExtra("playerId", 0);
+            staticsDetailsTV.setText(playerServices.findPlayerById(id).toString());
             //Todo játékos összes meccsének statisztikájának lekérése
             return;
         }
         if (Objects.equals(type, "match")){
+            id = getIntent().getLongExtra("matchId", 0);
+            Match match =matchServices.findMatchById(id);
+            String text = match.getDate() +", "+
+                    playerServices.findPlayerById(match.getPlayerId()).getName() + " vs "+
+                    match.getOpponent();
+            staticsDetailsTV.setText(text);
             //Todo adott mérkőzés statisztikájának lekérése
             return;
         }
     }
 
-    //    Email küldése a saját email címemre, email küldésre
-//    képes alkalmazások kiválasztási lehetőséggel.
     private void sendEmail() {
         String[] to = {"t.anti94@gmail.com"};
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, to);
-        if (intent.resolveActivity(getPackageManager()) != null) {
+        try {
             startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
         }
     }
 }

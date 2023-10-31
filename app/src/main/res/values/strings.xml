@@ -8,7 +8,7 @@
     <string name="date">Dátum</string>
     <string name="opponent">Ellenfél</string>
     <string name="start">Indítás</string>
-    <string name="yyyy_mm_dd">ÉÉÉÉ-HH-NN</string>
+    <string name="yyyy_mm_dd">ÉÉÉÉ.HH.NN</string>
     <string name="numberOfMatches">Mérkőzések száma: </string>
     <string name="addPlayerName">Név</string>
     <string name="addPlayerTeam">Csapat</string>
@@ -30,7 +30,6 @@
     <string name="fastBreak">Lerohanás</string>
     <string name="sevenMeters">7 méteres</string>
     <string name="summary">Összesen:</string>
-    <string name="longPass">Indítás</string>
     <string name="twoMinutes">2 perc</string>
     <string name="yellowCard">Sárga lap</string>
     <string name="redCard">Piros lap</string>
@@ -46,4 +45,8 @@
     <string name="endMatch">Vége</string>
     <string name="emptyDB">Nincs adat!</string>
     <string name="error">Hiba!</string>
+    <string name="not_found">Nem található!</string>
+    <string name="minutes">perc</string>
+    <string name="removeMatch">Biztos törölni szeretnéd ezt a mérkőzést?</string>
+    <string name="removeEvent">Biztos törölni szeretnéd ezt az eseményt?</string>
 </resources>

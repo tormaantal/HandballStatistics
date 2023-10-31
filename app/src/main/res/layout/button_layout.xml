@@ -8,7 +8,7 @@
     style="?android:attr/buttonBarStyle">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/addYellowCard"
         android:layout_weight="1"
         android:backgroundTint="@color/backGround"
         android:layout_margin="5dp"
@@ -19,7 +19,7 @@
         style="?android:attr/buttonBarButtonStyle" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/addTwoMinutes"
         android:layout_margin="5dp"
         android:layout_weight="1"
         android:backgroundTint="@color/backGround"
@@ -30,7 +30,7 @@
         style="?android:attr/buttonBarButtonStyle" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/addRedCard"
         android:layout_margin="5dp"
         android:layout_weight="1"
         android:backgroundTint="@color/backGround"
@@ -41,7 +41,7 @@
         style="?android:attr/buttonBarButtonStyle" />
 
     <Button
-        android:id="@+id/blu"
+        android:id="@+id/addBlueCard"
         android:layout_margin="5dp"
         android:layout_weight="1"
         android:backgroundTint="@color/backGround"
