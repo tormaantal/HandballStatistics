@@ -1,10 +1,8 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,9 +37,9 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
         init();
         navigationDrawer.setOnClickListener(view -> {
         });
-        menuImageView.setOnClickListener(view -> {
-            matchesDrawerLayout.openDrawer(GravityCompat.START);
-        });
+        menuImageView.setOnClickListener(view ->
+                matchesDrawerLayout.openDrawer(GravityCompat.START)
+        );
         tvNewMatch.setOnClickListener(view -> {
             openActivity(NewMatchActivity.class);
             finish();
@@ -50,13 +48,12 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
             openActivity(PlayersActivity.class);
             finish();
         });
-        tvContact.setOnClickListener(view -> {
-            sendEmail();
-        });
+        tvContact.setOnClickListener(view ->
+                sendEmail()
+        );
         addMatchImageView.setOnClickListener(view -> {
 
         });
-
     }
 
     private void init() {
@@ -82,11 +79,7 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, to);
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
-        }
+        startActivity(intent);
     }
 
     public void openActivity(Class<?> secondActivity) {
@@ -105,7 +98,8 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
     @Override
     public void onItemClick(int position) {
         Intent intent = new Intent(this, StatisticsActivity.class);
-        intent.putExtra("type", "match");
+        intent.putExtra("methodType", "match");
+        intent.putExtra("playerId", matchServices.findAllMatch().get(position).getPlayerId());
         intent.putExtra("matchId", matchServices.findAllMatch().get(position).getMatchId());
         startActivity(intent);
     }
@@ -117,8 +111,6 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
                 .setMessage(R.string.removeMatch)
                 .setIcon(R.drawable.baseline_delete_24)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-
-//                    Log.e("TAG", matchServices.findAllMatch().get(position).getMatchId() +"");
                     if (matchServices.deleteMatch(matchServices.findAllMatch().get(position).getMatchId()) == -1) {
                         Toast.makeText(this, "Hiba a törlés során!", Toast.LENGTH_SHORT).show();
                     } else {

@@ -7,17 +7,6 @@
     android:background="@color/white"
     tools:context=".activities.StatisticsActivity">
 
-    <Button
-        android:id="@+id/statisticsExportButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/export"
-        android:backgroundTint="@color/backGround"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
@@ -97,7 +86,7 @@
                     android:layout_weight="4"
                     android:gravity="center_horizontal"
                     android:padding="5sp"
-                    android:text="@string/saves"
+                    android:text="@string/save"
                     android:textColor="@color/white"
                     android:textSize="15sp" />
 
@@ -107,7 +96,7 @@
                     android:layout_weight="4"
                     android:gravity="center_horizontal"
                     android:padding="5sp"
-                    android:text="@string/gaols"
+                    android:text="@string/goal"
                     android:textColor="@color/white"
                     android:textSize="15sp" />
 
@@ -611,16 +600,6 @@
             <TableRow>
 
                 <TextView
-                    android:id="@+id/longPass"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:gravity="center_horizontal"
-                    android:padding="10sp"
-                    android:textColor="@color/backGround"
-                    android:textSize="12sp" />
-
-                <TextView
                     android:id="@+id/twoMinutes"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -666,6 +645,39 @@
 
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/expJson"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/backGround"
+        android:text="JSON"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/expEmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
+    <Button
+        android:id="@+id/expEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/backGround"
+        android:text="Email"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
+    <Button
+        android:id="@+id/expPdf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/backGround"
+        android:text="PDF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/expEmail"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

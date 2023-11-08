@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-import hu.szakdolgozat.handballstatistics.models.Event;
 import hu.szakdolgozat.handballstatistics.models.EventType;
 import hu.szakdolgozat.handballstatistics.models.Match;
 import hu.szakdolgozat.handballstatistics.models.Player;
@@ -30,15 +29,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String MATCHES_TABLE_NAME = "matches";
     private static final String MATCHES_COLUMN_ID = "matchId";
-    private static final String MATCHES_COLUMN_PLAYERID = "playerId";
+    private static final String MATCHES_COLUMN_PLAYER_ID = "playerId";
     private static final String MATCHES_COLUMN_OPPONENT = "opponent";
     private static final String MATCHES_COLUMN_DATE = "date";
     private static final String createMatchesTable = "CREATE TABLE IF NOT EXISTS " + MATCHES_TABLE_NAME + " (" +
             MATCHES_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            MATCHES_COLUMN_PLAYERID + " INTEGER, " +
+            MATCHES_COLUMN_PLAYER_ID + " INTEGER, " +
             MATCHES_COLUMN_DATE + " TEXT," +
             MATCHES_COLUMN_OPPONENT + " INTEGER, " +
-            "FOREIGN KEY (" + MATCHES_COLUMN_PLAYERID + ") REFERENCES " + PLAYERS_TABLE_NAME + "(" + PLAYERS_COLUMN_ID + "));";
+            "FOREIGN KEY (" + MATCHES_COLUMN_PLAYER_ID + ") REFERENCES " + PLAYERS_TABLE_NAME + "(" + PLAYERS_COLUMN_ID + "));";
 
 
     private static final String EVENTS_TABLE_NAME = "events";
@@ -75,24 +74,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public long addPlayer(long id, String name, String team) {
+    public long addPlayer(long playerId, String name, String team) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(PLAYERS_COLUMN_ID, id);
+        cv.put(PLAYERS_COLUMN_ID, playerId);
         cv.put(PLAYERS_COLUMN_NAME, name);
         cv.put(PLAYERS_COLUMN_TEAM, team);
         return db.insert(PLAYERS_TABLE_NAME, null, cv);
     }
 
-    public int deletePlayer(long id) {
+    public int deletePlayer(long playerId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        findAllMatchByPlayerId(id).forEach(this::deleteMatch);
-        return db.delete(PLAYERS_TABLE_NAME, "playerId=?", new String[]{String.valueOf(id)});
+        findAllMatchByPlayerId(playerId).forEach(match -> {
+            deleteMatch(match.getMatchId());
+        });
+        return db.delete(PLAYERS_TABLE_NAME, "playerId=?", new String[]{String.valueOf(playerId)});
     }
 
-    public Player findPlayerById(long id) {
+    public Player findPlayerById(long playerId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + PLAYERS_TABLE_NAME + " WHERE " + PLAYERS_COLUMN_ID + " = " + id;
+        String query = "SELECT * FROM " + PLAYERS_TABLE_NAME + " WHERE " + PLAYERS_COLUMN_ID + " = " + playerId;
         Cursor cursor = db.rawQuery(query, null);
         Player returnPlayer = null;
         if (cursor.moveToFirst()) {
@@ -126,58 +127,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(EVENTS_TABLE_NAME, null, cv);
     }
 
-    public int deleteEvent(long id) {
+    public int deleteEvent(long eventId) {
         SQLiteDatabase db = getWritableDatabase();
-        return db.delete(EVENTS_TABLE_NAME, "eventId=?", new String[]{String.valueOf(id)});
+        return db.delete(EVENTS_TABLE_NAME, "eventId=?", new String[]{String.valueOf(eventId)});
     }
 
-    public Event findEventById(long id) {
-        SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT * FROM " + EVENTS_TABLE_NAME + " WHERE " + EVENTS_COLUMN_ID + " = " + id + ";";
-        Cursor cursor = db.rawQuery(query, null);
-        Event event = null;
-        if (cursor.moveToFirst()) {
-            event = new Event(cursor.getLong(0), cursor.getLong(1), cursor.getString(2),
-                    typeResolve(cursor.getString(3)), cursor.getInt(4));
-        }
-        cursor.close();
-        return event;
-    }
 
-    public ArrayList<Event> findAllEventByMatchId(long matchId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<Event> returnList = new ArrayList<>();
-        String query = "SELECT * FROM " + EVENTS_TABLE_NAME + " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId + ";";
-        Cursor cursor = db.rawQuery(query, null);
-        if (cursor.moveToFirst()) {
-            do {
-                returnList.add(new Event(cursor.getLong(0), cursor.getLong(1), cursor.getString(2),
-                        typeResolve(cursor.getString(3)), cursor.getInt(4)));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return returnList;
-    }
-
-    public long addMatch(long playerId, String date, String opponenet) {
+    public long addMatch(long playerId, String date, String opponent) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(MATCHES_COLUMN_PLAYERID, playerId);
+        cv.put(MATCHES_COLUMN_PLAYER_ID, playerId);
         cv.put(MATCHES_COLUMN_DATE, date);
-        cv.put(MATCHES_COLUMN_OPPONENT, opponenet);
+        cv.put(MATCHES_COLUMN_OPPONENT, opponent);
         return db.insert(MATCHES_TABLE_NAME, null, cv);
     }
 
 
-    public int deleteMatch(long id) {
+    public int deleteMatch(long matchId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(EVENTS_TABLE_NAME, "matchId=?", new String[]{String.valueOf(id)});
-        return db.delete(MATCHES_TABLE_NAME, "matchId=?", new String[]{String.valueOf(id)});
+        db.delete(EVENTS_TABLE_NAME, "matchId=?", new String[]{String.valueOf(matchId)});
+        return db.delete(MATCHES_TABLE_NAME, "matchId=?", new String[]{String.valueOf(matchId)});
     }
 
-    public Match findMatchById(long id) {
+    public Match findMatchById(long matchId) {
         SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT * FROM " + MATCHES_TABLE_NAME + " WHERE " + MATCHES_COLUMN_ID + " = " + id;
+        String query = "SELECT * FROM " + MATCHES_TABLE_NAME + " WHERE " + MATCHES_COLUMN_ID + " = " + matchId;
         Cursor cursor = db.rawQuery(query, null);
         Match match = null;
         if (cursor.moveToFirst()) {
@@ -187,61 +161,291 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return match;
     }
 
-    public ArrayList<Match> findAllMatch(){
+    public ArrayList<Match> findAllMatch() {
         SQLiteDatabase db = getReadableDatabase();
         ArrayList<Match> returnList = new ArrayList<>();
         String query = "SELECT * FROM " + MATCHES_TABLE_NAME;
-        Cursor cursor = db.rawQuery(query,null);
-        if (cursor.moveToFirst()){
-            do{
-                returnList.add(new Match(cursor.getLong(0), cursor.getLong(1), cursor.getString(2), cursor.getString(3)));
-            }while (cursor.moveToNext());
-        }
-        cursor.close();
-        return returnList;
-    }
-
-    public ArrayList<Long> findAllMatchByPlayerId(long playerId) {
-        SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT matchId FROM " + MATCHES_TABLE_NAME + " WHERE " + MATCHES_COLUMN_PLAYERID + " = " + playerId;
         Cursor cursor = db.rawQuery(query, null);
-        ArrayList<Long> returnList = new ArrayList<>();
         if (cursor.moveToFirst()) {
-            returnList.add(cursor.getLong(0));
+            do {
+                returnList.add(new Match(cursor.getLong(0), cursor.getLong(1), cursor.getString(2), cursor.getString(3)));
+            } while (cursor.moveToNext());
         }
         cursor.close();
         return returnList;
     }
 
-    private EventType typeResolve(String type) {
-        switch (type) {
-            case "LEFTBACK":
-                return EventType.LEFTBACK;
-            case "CENTERBACK":
-                return EventType.CENTERBACK;
-            case "RIGHTBACK":
-                return EventType.RIGHTBACK;
-            case "RIGHTWING":
-                return EventType.RIGHTWING;
-            case "BREAKIN":
-                return EventType.BREAKIN;
-            case "PIVOT":
-                return EventType.PIVOT;
-            case "SEVENMETERS":
-                return EventType.SEVENMETERS;
-            case "FASTBREAK":
-                return EventType.FASTBREAK;
-            case "TWOMINUTES":
-                return EventType.TWOMINUTES;
-            case "YELLOWCARD":
-                return EventType.YELLOWCARD;
-            case "REDCARD":
-                return EventType.REDCARD;
-            case "BLUECARD":
-                return EventType.BLUECARD;
-            default:
-                return EventType.LEFTWING;
+    public ArrayList<Match> findAllMatchByPlayerId(long playerId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT * FROM " + MATCHES_TABLE_NAME + " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<Match> returnList = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                returnList.add(new Match(cursor.getLong(0), cursor.getLong(1), cursor.getString(2), cursor.getString(3)));
+            } while (cursor.moveToNext());
         }
+        cursor.close();
+        return returnList;
     }
 
+    public long findAllSaveByPlayer(long playerId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_RESULT + " =  1;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllGoalByPlayer(long playerId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_RESULT + " =  0;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllSaveByPlayerByType(long playerId, EventType type) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_TYPE + " = '" + type +
+                        "' AND " + EVENTS_COLUMN_RESULT + " =  1;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllGoalByPlayerByType(long playerId, EventType type) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_TYPE + " = '" + type +
+                        "' AND " + EVENTS_COLUMN_RESULT + " =  0;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllYellowCardByPlayer(long playerId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_RESULT + " =  2;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllTwoMinutesByPlayer(long playerId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_RESULT + " =  3;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllRedCardByPlayer(long playerId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_RESULT + " =  4;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllBlueCardByPlayer(long playerId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + MATCHES_COLUMN_ID + " FROM " + MATCHES_TABLE_NAME +
+                " WHERE " + MATCHES_COLUMN_PLAYER_ID + " = " + playerId + ";";
+        Cursor cursorMatchId = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursorMatchId.moveToFirst()) {
+            do {
+                query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                        " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + cursorMatchId.getLong(0) +
+                        " AND " + EVENTS_COLUMN_RESULT + " =  5;";
+                Cursor cursorEvent = db.rawQuery(query, null);
+                if (cursorEvent.moveToFirst()) rv += cursorEvent.getLong(0);
+                cursorEvent.close();
+            } while (cursorMatchId.moveToNext());
+        }
+        cursorMatchId.close();
+        return rv;
+    }
+
+    public long findAllSaveByMatch(long matchId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_RESULT + " =  1;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
+
+    public long findAllGoalByMatch(long matchId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_RESULT + " =  0;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
+
+    public long findAllSaveByMatchByType(long matchId, EventType type) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_TYPE + " = '" + type +
+                "' AND " + EVENTS_COLUMN_RESULT + " =  1;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
+
+    public long findAllGoalByMatchByType(long matchId, EventType type) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_TYPE + " = '" + type +
+                "' AND " + EVENTS_COLUMN_RESULT + " =  0;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
+
+    public long findAllYellowCardByMatch(long matchId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_RESULT + " =  2;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
+
+    public long findAllTwoMinutesByMatch(long matchId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_RESULT + " =  3;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
+
+    public long findAllRedCardByMatch(long matchId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_RESULT + " = 4;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
+
+    public long findAllBlueCardByMatch(long matchId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId +
+                " AND " + EVENTS_COLUMN_RESULT + " =  5;";
+        Cursor cursor = db.rawQuery(query, null);
+        long rv = 0;
+        if (cursor.moveToFirst()) rv = cursor.getLong(0);
+        cursor.close();
+        return rv;
+    }
 }

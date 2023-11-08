@@ -1,5 +1,7 @@
 package hu.szakdolgozat.handballstatistics.models;
 
+import androidx.annotation.NonNull;
+
 public class Event {
     private final long eventId;
     private final long matchId;
@@ -31,10 +33,7 @@ public class Event {
         return result;
     }
 
-    public long getMatchId() {
-        return matchId;
-    }
-
+    @NonNull
     @Override
     public String toString() {
         return "Event{" +

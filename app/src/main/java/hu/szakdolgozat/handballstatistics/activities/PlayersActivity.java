@@ -24,6 +24,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import hu.szakdolgozat.handballstatistics.R;
 import hu.szakdolgozat.handballstatistics.RecyclerViewInterface;
 import hu.szakdolgozat.handballstatistics.adapters.RecyclerViewPlayersAdapter;
+import hu.szakdolgozat.handballstatistics.models.Player;
 import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class PlayersActivity extends AppCompatActivity implements RecyclerViewInterface {
@@ -31,7 +32,7 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
     DrawerLayout playersDrawerLayout;
     LinearLayout navigationDrawer;
     ImageView menuImageView, addPlayerImageView;
-    TextView tvToolbar,tvNewMatch, tvMatches, tvContact;
+    TextView tvToolbar, tvNewMatch, tvMatches, tvContact;
     TextInputLayout tilPlayerId, tilPlayerName, tilPlayerTeam;
     EditText etPlayerId, etPlayerName, etPlayerTeam;
     Button addPlayerButton;
@@ -44,10 +45,11 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_players);
         init();
-        navigationDrawer.setOnClickListener(view -> {});
-        menuImageView.setOnClickListener(view -> {
-            playersDrawerLayout.openDrawer(GravityCompat.START);
+        navigationDrawer.setOnClickListener(view -> {
         });
+        menuImageView.setOnClickListener(view ->
+                playersDrawerLayout.openDrawer(GravityCompat.START)
+        );
         tvNewMatch.setOnClickListener(view -> {
             openActivity(NewMatchActivity.class);
             finish();
@@ -56,13 +58,12 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
             openActivity(MatchesActivity.class);
             finish();
         });
-        tvContact.setOnClickListener(view -> {
-            sendEmail();
-        });
-        addPlayerImageView.setOnClickListener(view -> {
-            addPlayerAction();
-        });
-
+        tvContact.setOnClickListener(view ->
+                sendEmail()
+        );
+        addPlayerImageView.setOnClickListener(view ->
+                addPlayerAction()
+        );
     }
 
     private void init() {
@@ -162,8 +163,9 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
     @Override
     public void onItemClick(int position) {
         Intent intent = new Intent(this, StatisticsActivity.class);
-        intent.putExtra("type", "playerId");
-        intent.putExtra("id", playerServices.findAllPlayer().get(position).getId());
+        Player player = playerServices.findAllPlayer().get(position);
+        intent.putExtra("methodType", "player");
+        intent.putExtra("playerId", player.getId());
         startActivity(intent);
     }
 

@@ -26,9 +26,17 @@ public class Player {
         return team;
     }
 
+
     @NonNull
     @Override
     public String toString() {
-        return name + " - " + team + " (" + playerId + ")";
+        return name + " (" + team + " - " + playerId + ")";
+    }
+
+    public String getFileName() {
+        return name.trim().replaceAll(" ", "_").toLowerCase() + "_" +
+                team.trim().replaceAll(" ", "_").toLowerCase() + "_" +
+                playerId + "_";
+
     }
 }

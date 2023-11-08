@@ -1,8 +1,6 @@
 package hu.szakdolgozat.handballstatistics.adapters;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,21 +39,24 @@ public class RecyclerViewEventsAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public void onBindViewHolder(@NonNull eventsViewHolder holder, int position) {
         Event e = eventList.get(position);
-        holder.rvrEventsName.setText(String.valueOf(e.getResult()));
-        holder.rvrEventsType.setText(e.getType().toString());
+        holder.rvrEventsName.setText(resultToString(e.getResult()));
+        holder.rvrEventsType.setText(typeToString(e.getType()));
         holder.rvrEventsTime.setText(e.getTime());
+    }
 
-        /*   switch (eventList.get(position).getResult()) {
+    private String resultToString(int result) {
+        switch (result) {
             case 0:
-                holder.rvrStatisticsName.setText("Védés");
-                holder.rvrStatisticsTime.setText(eventList.get(position).getTime());
-                holder.rvrStatisticsType.setText(typeConvert(eventList.get(position).getType()));
-                break;
+                return context.getString(R.string.goal) + "!";
             case 1:
-
+                return context.getString(R.string.save) + "!";
+            case 2:
+                return "Figyelmeztetés!";
+            case 3:
+                return "Kiállítás!";
+            default:
+                return "";
         }
-
-*/
     }
 
     @Override
@@ -63,35 +64,30 @@ public class RecyclerViewEventsAdapter extends RecyclerView.Adapter<RecyclerView
         return eventList.size();
     }
 
-    private String typeConvert(EventType type) {
-        Resources resources = null;
+    private String typeToString(EventType type) {
         switch (type) {
             case PIVOT:
-                return String.format(resources.getString(R.string.pivot));
+                return context.getString(R.string.pivot);
             case BREAKIN:
-                return String.format(resources.getString(R.string.breakIn));
+                return context.getString(R.string.breakIn);
             case CENTERBACK:
-                return String.format(resources.getString(R.string.centralBack));
+                return context.getString(R.string.centralBack);
             case FASTBREAK:
-                return String.format(resources.getString(R.string.fastBreak));
+                return context.getString(R.string.fastBreak);
             case LEFTBACK:
-                return String.format(resources.getString(R.string.leftBack));
+                return context.getString(R.string.leftBack);
             case LEFTWING:
-                return String.format(resources.getString(R.string.leftWing));
+                return context.getString(R.string.leftWing);
             case RIGHTBACK:
-                return String.format(resources.getString(R.string.rightBack));
+                return context.getString(R.string.rightBack);
             case RIGHTWING:
-                return String.format(resources.getString(R.string.rightWing));
+                return context.getString(R.string.rightWing);
             case SEVENMETERS:
-                return String.format(resources.getString(R.string.sevenMeters));
-            case TWOMINUTES:
-                return String.format(resources.getString(R.string.twoMinutes));
+                return context.getString(R.string.sevenMeters);
             case YELLOWCARD:
-                return String.format(resources.getString(R.string.yellowCard));
-            case REDCARD:
-                return String.format(resources.getString(R.string.redCard));
-            case BLUECARD:
-                return String.format(resources.getString(R.string.blueCard));
+                return context.getString(R.string.yellowCard) + "!";
+            case TWOMINUTES:
+                return context.getString(R.string.twoMinutes) + "!";
             default:
                 return "";
         }

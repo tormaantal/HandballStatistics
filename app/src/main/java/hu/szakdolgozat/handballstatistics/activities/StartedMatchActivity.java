@@ -89,21 +89,13 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
         addSave.setOnClickListener(view -> {
             addSave.startAnimation(AnimationUtils.loadAnimation(this, R.anim.animation_image_view));
             if (isTypeSelected()) {
-                rbLeftWing.setChecked(false);
-                rbLeftBack.setChecked(false);
-                rbPivot.setChecked(false);
-                rbSevenMeters.setChecked(false);
-                rbCentralBack.setChecked(false);
-                rbRightBack.setChecked(false);
-                rbRightWing.setChecked(false);
-                rbBreakIn.setChecked(false);
-                rbFastBreak.setChecked(false);
+                setAllRadioButtonCheckedFalse();
                 eventId = eventServices.addEvent(matchId, getTime(), type, 1);
                 events.add(0, new Event(eventId, matchId, getTime(), type, 1));
-                adapter.notifyItemInserted(0);
+                events.sort((e1, e2) -> e2.getTime().compareToIgnoreCase(e1.getTime()));
+                adapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(0);
                 type = null;
-                Toast.makeText(this, "Hozzáadva", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Válassz ki egy pozíciót!", Toast.LENGTH_SHORT).show();
             }
@@ -111,21 +103,13 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
         addGoal.setOnClickListener(view -> {
             addGoal.startAnimation(AnimationUtils.loadAnimation(this, R.anim.animation_image_view));
             if (isTypeSelected()) {
-                rbLeftWing.setChecked(false);
-                rbLeftBack.setChecked(false);
-                rbPivot.setChecked(false);
-                rbSevenMeters.setChecked(false);
-                rbCentralBack.setChecked(false);
-                rbRightBack.setChecked(false);
-                rbRightWing.setChecked(false);
-                rbBreakIn.setChecked(false);
-                rbFastBreak.setChecked(false);
+                setAllRadioButtonCheckedFalse();
                 eventId = eventServices.addEvent(matchId, getTime(), type, 0);
                 events.add(0, new Event(eventId, matchId, getTime(), type, 0));
-                adapter.notifyItemInserted(0);
+                events.sort((e1, e2) -> e2.getTime().compareToIgnoreCase(e1.getTime()));
+                adapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(0);
                 type = null;
-                Toast.makeText(this, "Hozzáadva", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Válassz ki egy pozíciót!", Toast.LENGTH_SHORT).show();
             }
@@ -155,32 +139,6 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
                 rbLeftWing.setChecked(false);
                 rbPivot.setChecked(false);
                 rbSevenMeters.setChecked(false);
-                rbCentralBack.setChecked(false);
-                rbRightBack.setChecked(false);
-                rbRightWing.setChecked(false);
-                rbBreakIn.setChecked(false);
-                rbFastBreak.setChecked(false);
-            }
-        });
-        rbPivot.setOnCheckedChangeListener((compoundButton, checked) -> {
-            if (checked) {
-                type = EventType.PIVOT;
-                rbLeftBack.setChecked(false);
-                rbLeftWing.setChecked(false);
-                rbSevenMeters.setChecked(false);
-                rbCentralBack.setChecked(false);
-                rbRightBack.setChecked(false);
-                rbRightWing.setChecked(false);
-                rbBreakIn.setChecked(false);
-                rbFastBreak.setChecked(false);
-            }
-        });
-        rbSevenMeters.setOnCheckedChangeListener((compoundButton, checked) -> {
-            if (checked) {
-                type = EventType.SEVENMETERS;
-                rbLeftBack.setChecked(false);
-                rbPivot.setChecked(false);
-                rbLeftWing.setChecked(false);
                 rbCentralBack.setChecked(false);
                 rbRightBack.setChecked(false);
                 rbRightWing.setChecked(false);
@@ -227,6 +185,32 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
                 rbFastBreak.setChecked(false);
             }
         });
+        rbPivot.setOnCheckedChangeListener((compoundButton, checked) -> {
+            if (checked) {
+                type = EventType.PIVOT;
+                rbLeftBack.setChecked(false);
+                rbLeftWing.setChecked(false);
+                rbSevenMeters.setChecked(false);
+                rbCentralBack.setChecked(false);
+                rbRightBack.setChecked(false);
+                rbRightWing.setChecked(false);
+                rbBreakIn.setChecked(false);
+                rbFastBreak.setChecked(false);
+            }
+        });
+        rbSevenMeters.setOnCheckedChangeListener((compoundButton, checked) -> {
+            if (checked) {
+                type = EventType.SEVENMETERS;
+                rbLeftBack.setChecked(false);
+                rbPivot.setChecked(false);
+                rbLeftWing.setChecked(false);
+                rbCentralBack.setChecked(false);
+                rbRightBack.setChecked(false);
+                rbRightWing.setChecked(false);
+                rbBreakIn.setChecked(false);
+                rbFastBreak.setChecked(false);
+            }
+        });
         rbBreakIn.setOnCheckedChangeListener((compoundButton, checked) -> {
             if (checked) {
                 type = EventType.BREAKIN;
@@ -262,7 +246,7 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
             addYellowCard.setAlpha(0.5F);
         });
         addTwoMinutes.setOnClickListener(view -> {
-            if (++twominutes==3){
+            if (++twominutes == 3) {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.redCard)
                         .setMessage("A játékost véglegesen kiállították!")
@@ -274,55 +258,84 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
                         })
                         .setCancelable(false)
                         .show();
+            } else {
+                eventId = eventServices.addEvent(matchId, getTime(), EventType.TWOMINUTES, 3);
+                events.add(0, new Event(eventId, matchId, getTime(), EventType.TWOMINUTES, 3));
+                events.sort((e1, e2) -> e2.getTime().compareToIgnoreCase(e1.getTime()));
+                adapter.notifyDataSetChanged();
+                recyclerView.scrollToPosition(0);
             }
-            eventId = eventServices.addEvent(matchId, getTime(), EventType.TWOMINUTES, 3);
-            events.add(0, new Event(eventId, matchId, getTime(), EventType.TWOMINUTES, 3));
-            adapter.notifyItemInserted(0);
-            recyclerView.scrollToPosition(0);
         });
-        addRedCard.setOnClickListener(view -> {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.redCard)
-                    .setMessage("A játékost véglegesen kiállították!")
-                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                        eventServices.addEvent(matchId, getTime(), EventType.REDCARD, 4);
-                        finish();
-                        Intent intent = new Intent(this, MatchesActivity.class);
-                        startActivity(intent);
-                    })
-                    .setNegativeButton(R.string.no, (dialogInterface, i) -> {
-                    })
-                    .show();
-        });
-        addBlueCard.setOnClickListener(view -> {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.blueCard)
-                    .setMessage("A játékost véglegesen kiállították!")
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                        eventServices.addEvent(matchId, getTime(), EventType.REDCARD, 4);
-                        eventServices.addEvent(matchId, getTime(), EventType.BLUECARD, 5);
-                        finish();
-                        Intent intent = new Intent(this, MatchesActivity.class);
-                        startActivity(intent);
-                    })
-                    .setNegativeButton(R.string.no, (dialogInterface, i) -> {
-                    })
-                    .show();
-        });
+        addRedCard.setOnClickListener(view ->
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.redCard)
+                        .setMessage("A játékost véglegesen kiállították!")
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                            eventServices.addEvent(matchId, getTime(), EventType.REDCARD, 4);
+                            finish();
+                            Intent intent = new Intent(this, MatchesActivity.class);
+                            startActivity(intent);
+                        })
+                        .setNegativeButton(R.string.no, (dialogInterface, i) -> {
+                        })
+                        .show()
+        );
+        addBlueCard.setOnClickListener(view ->
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.blueCard)
+                        .setMessage("A játékost véglegesen kiállították!")
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                            eventServices.addEvent(matchId, getTime(), EventType.REDCARD, 4);
+                            eventServices.addEvent(matchId, getTime(), EventType.BLUECARD, 5);
+                            finish();
+                            Intent intent = new Intent(this, MatchesActivity.class);
+                            startActivity(intent);
+                        })
+                        .setNegativeButton(R.string.no, (dialogInterface, i) -> {
+                        })
+                        .show()
+        );
+    }
+
+    private void setAllRadioButtonCheckedFalse() {
+        rbLeftWing.setChecked(false);
+        rbLeftBack.setChecked(false);
+        rbPivot.setChecked(false);
+        rbSevenMeters.setChecked(false);
+        rbCentralBack.setChecked(false);
+        rbRightBack.setChecked(false);
+        rbRightWing.setChecked(false);
+        rbBreakIn.setChecked(false);
+        rbFastBreak.setChecked(false);
     }
 
     private boolean isTypeSelected() {
         return type != null;
     }
 
+    @Override
+    public void onBackPressed() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Megkaszítás!")
+                .setMessage("Biztos megszakítja a mérkőzést? Minden eddigi adatot elveszít!")
+                .setIcon(R.drawable.baseline_delete_24)
+                .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                    matchServices.deleteMatch(matchId);
+                    super.onBackPressed();
+                })
+                .setNegativeButton(R.string.no, (dialogInterface, i) -> {
+
+                })
+                .show();
+    }
+
     private String getTime() {
-        return npMinutes.getValue() + ". perc";
+        return npMinutes.getValue() > 9 ? npMinutes.getValue() + ". perc" : "0" + npMinutes.getValue() + ". perc";
     }
 
     @Override
     public void onItemClick(int position) {
-
     }
 
     @Override
@@ -335,10 +348,16 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
                     if (eventServices.deleteEvent(events.get(position).getEventId()) == -1) {
                         Toast.makeText(this, "Hiba a törlés során!", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Esemény törölve!", Toast.LENGTH_SHORT).show();
+                        if (events.get(position).getResult() == 2) {
+                            addYellowCard.setEnabled(true);
+                            addYellowCard.setAlpha(1.0F);
+                        }
+                        if (events.get(position).getResult() == 3) {
+                            twominutes--;
+                        }
+                        events.remove(position);
+                        adapter.notifyItemRemoved(position);
                     }
-                    adapter.notifyItemRemoved(position);
-                    recreate();
                 })
                 .setNegativeButton(R.string.no, (dialogInterface, i) -> {
 

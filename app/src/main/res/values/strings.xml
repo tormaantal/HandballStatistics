@@ -16,8 +16,8 @@
     <string name="addPlayerTitle">Új játékos hozzáadása</string>
     <string name="addPlayerId">Engedélyszám</string>
     <string name="statisticsLabel">Részletes statisztika</string>
-    <string name="saves">Védés</string>
-    <string name="gaols">Gól</string>
+    <string name="save">Védés</string>
+    <string name="goal">Gól</string>
     <string name="efficiency">Hatékonyság</string>
     <string name="position">Pozíció</string>
     <string name="leftWing">Balszélső</string>
@@ -29,7 +29,7 @@
     <string name="breakIn">Betörés</string>
     <string name="fastBreak">Lerohanás</string>
     <string name="sevenMeters">7 méteres</string>
-    <string name="summary">Összesen:</string>
+    <string name="summary">Összesen</string>
     <string name="twoMinutes">2 perc</string>
     <string name="yellowCard">Sárga lap</string>
     <string name="redCard">Piros lap</string>
@@ -49,4 +49,7 @@
     <string name="minutes">perc</string>
     <string name="removeMatch">Biztos törölni szeretnéd ezt a mérkőzést?</string>
     <string name="removeEvent">Biztos törölni szeretnéd ezt az eseményt?</string>
+    <string name="downloaded">Letöltve</string>
+    <string name="sendEmail">Email küldése...</string>
+    <string name="pdfCreated">Pdf létrehozva!</string>
 </resources>
