@@ -52,4 +52,5 @@
     <string name="downloaded">Letöltve</string>
     <string name="sendEmail">Email küldése...</string>
     <string name="pdfCreated">Pdf létrehozva!</string>
+    <string name="done">Kész</string>
 </resources>

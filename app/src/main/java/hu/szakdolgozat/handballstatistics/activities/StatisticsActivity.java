@@ -1,28 +1,24 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
@@ -54,12 +50,34 @@ public class StatisticsActivity extends AppCompatActivity {
             EventType.RIGHTBACK, EventType.RIGHTWING, EventType.PIVOT,
             EventType.FASTBREAK, EventType.BREAKIN, EventType.SEVENMETERS
     };
-    private static final int PERMISSION_REQUEST_CODE = 1;
     private PlayerServices playerServices;
     private MatchServices matchServices;
     private EventServices eventServices;
     private long playerId, matchId, save, goal;
     private int exportType;
+    private final ActivityResultLauncher<Intent> storageActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (checkPermission()) {
+                            switch (exportType) {
+                                case 1:
+                                    generatePlayerPdf();
+                                    break;
+                                case 2:
+                                    generatePlayerJson();
+                                    break;
+                                case 3:
+                                    generateMatchPdf();
+                                    break;
+                                case 4:
+                                    generateMatchJson();
+                                    break;
+                            }
+                            Log.d("TAG", "onActivityResult: Manage External Storage Permissions Granted");
+                        } else {
+                            Toast.makeText(StatisticsActivity.this, "Storage Permissions Denied", Toast.LENGTH_SHORT).show();
+                        }
+                    });
     private double efficiency;
     private String methodType;
     private Button expJson, expEmail, expPdf;
@@ -82,6 +100,7 @@ public class StatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
         init();
+        Log.e("TAG", Environment.isExternalStorageManager() + "");
         if (Objects.equals(methodType, "player")) {
             loadPlayerStatistics(playerId);
             exportPlayer();
@@ -287,29 +306,23 @@ public class StatisticsActivity extends AppCompatActivity {
         expPdf.setOnClickListener(v -> {
             if (checkPermission()) {
                 exportType = 1;
-                Log.e("TAG:", "PlayerExpPDFClick nincs engedély");
                 requestPermission();
             } else {
-                Log.e("TAG:", "PlayerExpPDFClick van engedély");
                 generatePlayerPdf();
             }
         });
         expJson.setOnClickListener(v -> {
             if (checkPermission()) {
                 exportType = 2;
-                Log.e("TAG:", "PlayerExpJSONClick nincs engedély");
                 requestPermission();
             } else {
-                Log.e("TAG:", "PlayerExpJSONClick van engedély");
                 generatePlayerJson();
             }
         });
         expEmail.setOnClickListener(v -> {
             if (checkPermission()) {
-                Log.e("TAG:", "PlayerExpEmailClick nincs engedély");
                 requestPermission();
             } else {
-                Log.e("TAG:", "PlayerExpEmailClick van engedély");
                 generatePlayerPdfToEmail();
             }
         });
@@ -319,7 +332,6 @@ public class StatisticsActivity extends AppCompatActivity {
         expPdf.setOnClickListener(v -> {
             if (checkPermission()) {
                 exportType = 3;
-                Toast.makeText(this, "NINCS ÍRÁS ENGEDÉLY!", Toast.LENGTH_SHORT).show();
                 requestPermission();
             } else {
                 generateMatchPdf();
@@ -328,7 +340,6 @@ public class StatisticsActivity extends AppCompatActivity {
         expJson.setOnClickListener(v -> {
             if (checkPermission()) {
                 exportType = 4;
-                Toast.makeText(this, "NINCS ÍRÁS ENGEDÉLY!", Toast.LENGTH_SHORT).show();
                 requestPermission();
             } else {
                 generateMatchJson();
@@ -336,7 +347,6 @@ public class StatisticsActivity extends AppCompatActivity {
         });
         expEmail.setOnClickListener(v -> {
             if (checkPermission()) {
-                Toast.makeText(this, "NINCS ÍRÁS ENGEDÉLY!", Toast.LENGTH_SHORT).show();
                 requestPermission();
             } else {
                 generateMatchPdfToEmail();
@@ -345,43 +355,22 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
 
+        try {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
+            intent.setData(uri);
+            storageActivityResultLauncher.launch(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            storageActivityResultLauncher.launch(intent);
+        }
     }
 
     private boolean checkPermission() {
-        int permission1 = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
-        int permission2 = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
-        return permission1 != PackageManager.PERMISSION_GRANTED || permission2 != PackageManager.PERMISSION_GRANTED;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults[0] == RESULT_OK) {
-                Log.e("TAG:", "onRequestPermissionsResult Oké");
-                Toast.makeText(this, "Hozzáférés engedélyezve!", Toast.LENGTH_SHORT).show();
-                switch (exportType) {
-                    case 1:
-                        generatePlayerPdf();
-                        break;
-                    case 2:
-                        generatePlayerJson();
-                        break;
-                    case 3:
-                        generateMatchPdf();
-                        break;
-                    case 4:
-                        generateMatchJson();
-                        break;
-                }
-            } else {
-                Log.e("TAG:", "onRequestPermissionsResult WRITE Nem oké");
-                Toast.makeText(this, "Írás megtagadva!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        return Environment.isExternalStorageManager();
     }
 
     private void generatePlayerJson() {
@@ -406,10 +395,9 @@ public class StatisticsActivity extends AppCompatActivity {
             File file = new File(externalDir, fileName);
             try (Writer writer = new FileWriter(file)) {
                 gson.toJson(combinedJson, writer);
-                Log.e("TAG", file.getAbsolutePath());
                 Toast.makeText(this, "Done" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
-                Log.e("TAG", e.toString());
+                Log.e("generatePlayerJson", "exception catch: " + e);
             }
         }
     }
@@ -432,10 +420,9 @@ public class StatisticsActivity extends AppCompatActivity {
         File file = new File(externalDir, fileName);
         try (Writer writer = new FileWriter(file)) {
             gson.toJson(combinedJson, writer);
-            Log.e("TAG", file.getAbsolutePath());
-            Toast.makeText(this, "Done" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.done) + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            Log.e("TAG", e.toString());
+            Log.e("generateMatchJson", "exception catch" + e);
         }
     }
 
@@ -469,10 +456,9 @@ public class StatisticsActivity extends AppCompatActivity {
                     }
                 });
                 pdfDocument.close();
-                Log.e("TAG", file.getAbsolutePath());
-                Toast.makeText(this, getString(R.string.pdfCreated), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.done) + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
-                Log.e("TAG: exception catch:asd ", e.toString());
+                Log.e("generatePlayerPdf", "exception catch: " + e);
             }
         }
     }
@@ -493,10 +479,9 @@ public class StatisticsActivity extends AppCompatActivity {
             drawTable(page, setDataMatch(match.getMatchId()));
             pdfDocument.finishPage(page);
             pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-            Log.e("TAG", file.getAbsolutePath());
-            Toast.makeText(this, getString(R.string.pdfCreated), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.done) + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("generateMatchPdf", "exp catch: " + e);
         }
         pdfDocument.close();
     }
@@ -527,13 +512,12 @@ public class StatisticsActivity extends AppCompatActivity {
                     try {
                         pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
                     } catch (IOException e) {
-                        Log.e("TAG", e.toString());
+                        Log.e("generatePlayerPdfToEmail ", "inner exp catch: " + e);
                     }
                 });
                 pdfDocument.close();
-                Toast.makeText(this, getString(R.string.pdfCreated), Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
-                Log.e("TAG: exception catch:asd ", e.toString());
+                Log.e("generatePlayerPdfToEmail ", "exp catch: " + e);
             }
             Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);
             String[] to = {"t.anti94@gmail.com"};
@@ -566,10 +550,8 @@ public class StatisticsActivity extends AppCompatActivity {
             drawTable(page, setDataMatch(match.getMatchId()));
             pdfDocument.finishPage(page);
             pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-            Log.e("TAG", file.getAbsolutePath());
-            Toast.makeText(this, getString(R.string.pdfCreated), Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("generateMatchPdfToEmail", "exp catch: " + e);
         }
         pdfDocument.close();
         Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);

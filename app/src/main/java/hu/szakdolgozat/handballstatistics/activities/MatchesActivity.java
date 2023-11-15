@@ -1,14 +1,11 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,11 +14,8 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,7 +32,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
 import hu.szakdolgozat.handballstatistics.R;
@@ -52,7 +45,6 @@ import hu.szakdolgozat.handballstatistics.services.MatchServices;
 import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class MatchesActivity extends AppCompatActivity implements RecyclerViewInterface {
-    private static final int PERMISSION_REQUEST_CODE = 1;
     PlayerServices playerServices;
     MatchServices matchServices;
     EventServices eventServices;
@@ -74,6 +66,21 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
                 }
             }
     );
+    private final ActivityResultLauncher<Intent> storageActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (checkPermission()) {
+                            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.setType("application/json");
+                            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS));
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startPickJson.launch(intent);
+                            Log.d("TAG", "onActivityResult: Manage External Storage Permissions Granted");
+                        } else {
+                            Toast.makeText(MatchesActivity.this, "Storage Permissions Denied", Toast.LENGTH_SHORT).show();
+                        }
+                    });
     TextView tvToolbar, tvNewMatch, tvPlayers, tvContact;
     DrawerLayout matchesDrawerLayout;
     ImageView menuImageView, addMatchImageView;
@@ -100,9 +107,9 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
                 sendEmail()
         );
         addMatchImageView.setOnClickListener(view -> {
-            if (!checkPermission()){
+            if (!checkPermission()) {
                 requestPermission();
-            }else {
+            } else {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("application/json");
@@ -139,7 +146,7 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
         try (Reader reader = new FileReader(file)) {
             combinedJson = JsonParser.parseReader(reader).getAsJsonObject();
         } catch (IOException e) {
-            Log.e("TAG", e.toString());
+            Log.e("readJsonFile", "exp catch:" + e);
         }
         if (combinedJson != null) {
             Gson gson = new Gson();
@@ -207,36 +214,21 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
     }
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-
+        try {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
+            intent.setData(uri);
+            storageActivityResultLauncher.launch(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            storageActivityResultLauncher.launch(intent);
+        }
     }
 
     private boolean checkPermission() {
-        int permission1 = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
-        int permission2 = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
-        return permission1 != PackageManager.PERMISSION_GRANTED || permission2 != PackageManager.PERMISSION_GRANTED;
-    }
-
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.e("PERMISSIONS:", Arrays.toString(permissions) + " - " + grantResults[0] + "\n" + grantResults[1]);
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            boolean writeStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-            boolean readStorage = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-            if (writeStorage && readStorage) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/json");
-                intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS));
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startPickJson.launch(intent);
-            } else {
-                Log.e("TAG", "Engedély megtagadva");
-                finish();
-            }
-        }
+        return Environment.isExternalStorageManager();
     }
 
     private void sendEmail() {
