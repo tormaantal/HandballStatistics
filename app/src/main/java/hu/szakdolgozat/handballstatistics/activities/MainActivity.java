@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +18,6 @@ import hu.szakdolgozat.handballstatistics.R;
 public class MainActivity extends AppCompatActivity {
     DrawerLayout mainDrawerLayout;
     ImageView menu;
-    LinearLayout navigationDrawer;
     TextView tvNewMatch, tvPlayers, tvMatches, tvContact;
 
     @Override
@@ -27,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initMainActivity();
-        navigationDrawer.setOnClickListener(view -> {
-        });
         menu.setOnClickListener(view ->
                 mainDrawerLayout.openDrawer(GravityCompat.START)
         );
@@ -49,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private void initMainActivity() {
         mainDrawerLayout = findViewById(R.id.mainDrawerLayout);
         menu = findViewById(R.id.menuImageView);
-        navigationDrawer = findViewById(R.id.navigationDrawer);
         tvNewMatch = findViewById(R.id.tvNewMatch);
         tvPlayers = findViewById(R.id.tvPlayers);
         tvMatches = findViewById(R.id.tvMatches);

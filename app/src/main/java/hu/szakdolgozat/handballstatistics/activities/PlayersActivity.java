@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +29,6 @@ import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 public class PlayersActivity extends AppCompatActivity implements RecyclerViewInterface {
     PlayerServices playerServices;
     DrawerLayout playersDrawerLayout;
-    LinearLayout navigationDrawer;
     ImageView menuImageView, addPlayerImageView;
     TextView tvToolbar, tvNewMatch, tvMatches, tvContact;
     TextInputLayout tilPlayerId, tilPlayerName, tilPlayerTeam;
@@ -45,8 +43,6 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_players);
         init();
-        navigationDrawer.setOnClickListener(view -> {
-        });
         menuImageView.setOnClickListener(view ->
                 playersDrawerLayout.openDrawer(GravityCompat.START)
         );
@@ -70,7 +66,6 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
         playerServices = new PlayerServices(this);
         tvToolbar = findViewById(R.id.tvToolbar);
         tvToolbar.setText(R.string.players);
-        navigationDrawer = findViewById(R.id.navigationDrawer);
         playersDrawerLayout = findViewById(R.id.playersDrawerLayout);
         menuImageView = findViewById(R.id.menuImageView);
         addPlayerImageView = findViewById(R.id.create);

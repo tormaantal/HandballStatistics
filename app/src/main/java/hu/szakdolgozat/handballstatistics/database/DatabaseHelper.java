@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
+import hu.szakdolgozat.handballstatistics.models.Event;
 import hu.szakdolgozat.handballstatistics.models.EventType;
 import hu.szakdolgozat.handballstatistics.models.Match;
 import hu.szakdolgozat.handballstatistics.models.Player;
@@ -22,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String PLAYERS_COLUMN_ID = "playerId";
     private static final String PLAYERS_COLUMN_NAME = "name";
     private static final String PLAYERS_COLUMN_TEAM = "team";
-    private static final String createPlayerTable = "CREATE TABLE IF NOT EXISTS " + PLAYERS_TABLE_NAME + " (" +
+    private static final String createPlayerTable = "CREATE TABLE " + PLAYERS_TABLE_NAME + " (" +
             PLAYERS_COLUMN_ID + " INTEGER PRIMARY KEY, " +
             PLAYERS_COLUMN_NAME + " TEXT, " +
             PLAYERS_COLUMN_TEAM + " TEXT);";
@@ -32,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String MATCHES_COLUMN_PLAYER_ID = "playerId";
     private static final String MATCHES_COLUMN_OPPONENT = "opponent";
     private static final String MATCHES_COLUMN_DATE = "date";
-    private static final String createMatchesTable = "CREATE TABLE IF NOT EXISTS " + MATCHES_TABLE_NAME + " (" +
+    private static final String createMatchesTable = "CREATE TABLE " + MATCHES_TABLE_NAME + " (" +
             MATCHES_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             MATCHES_COLUMN_PLAYER_ID + " INTEGER, " +
             MATCHES_COLUMN_DATE + " TEXT," +
@@ -46,7 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String EVENTS_COLUMN_TIME = "time";
     private static final String EVENTS_COLUMN_TYPE = "type";
     private static final String EVENTS_COLUMN_RESULT = "result";
-    private static final String createEventsTable = "CREATE TABLE IF NOT EXISTS " + EVENTS_TABLE_NAME + " (" +
+    private static final String createEventsTable = "CREATE TABLE " + EVENTS_TABLE_NAME + " (" +
             EVENTS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             EVENTS_COLUMN_MATCH_ID + " INTEGER," +
             EVENTS_COLUMN_TIME + " TEXT, " +
@@ -85,9 +86,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public int deletePlayer(long playerId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        findAllMatchByPlayerId(playerId).forEach(match -> {
-            deleteMatch(match.getMatchId());
-        });
+        findAllMatchByPlayerId(playerId).forEach(match ->
+                deleteMatch(match.getMatchId())
+        );
         return db.delete(PLAYERS_TABLE_NAME, "playerId=?", new String[]{String.valueOf(playerId)});
     }
 
@@ -447,5 +448,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) rv = cursor.getLong(0);
         cursor.close();
         return rv;
+    }
+
+    public ArrayList<Event> findAllEventByMatchId(long matchId) {
+
+        ArrayList<Event> returnList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + EVENTS_TABLE_NAME +
+                " WHERE " + EVENTS_COLUMN_MATCH_ID + " = " + matchId;
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                returnList.add(new Event(cursor.getLong(0), cursor.getLong(1), cursor.getString(2),
+                        stringToType(cursor.getString(3)),cursor.getInt(4)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return returnList;
+    }
+
+    private EventType stringToType(String type) {
+        switch (type) {
+            case "PIVOT":
+                return EventType.PIVOT;
+            case "BREAKIN":
+                return EventType.BREAKIN;
+            case "CENTERBACK":
+                return EventType.CENTERBACK;
+            case "FASTBREAK":
+                return EventType.FASTBREAK;
+            case "LEFTBACK":
+                return EventType.LEFTBACK;
+            case "LEFTWING":
+                return EventType.LEFTWING;
+            case "RIGHTBACK":
+                return EventType.RIGHTBACK;
+            case "RIGHTWING":
+                return EventType.RIGHTWING;
+            case "SEVENMETERS":
+                return EventType.SEVENMETERS;
+            case "YELLOWCARD":
+                return EventType.YELLOWCARD;
+            case "TWOMINUTES":
+                return EventType.TWOMINUTES;
+            case "REDCARD":
+                return EventType.REDCARD;
+            case "BLUECARD":
+                return EventType.BLUECARD;
+            default:
+                return null;
+        }
     }
 }

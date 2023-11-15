@@ -2,7 +2,10 @@ package hu.szakdolgozat.handballstatistics.services;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+
 import hu.szakdolgozat.handballstatistics.database.DatabaseHelper;
+import hu.szakdolgozat.handballstatistics.models.Event;
 import hu.szakdolgozat.handballstatistics.models.EventType;
 
 public class EventServices {
@@ -20,4 +23,7 @@ public class EventServices {
         return db.deleteEvent(id);
     }
 
+    public ArrayList<Event> findAllEventByMatchId(long matchId) {
+        return db.findAllEventByMatchId(matchId);
+    }
 }

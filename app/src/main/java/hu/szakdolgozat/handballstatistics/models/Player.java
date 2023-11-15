@@ -36,7 +36,7 @@ public class Player {
     public String getFileName() {
         return name.trim().replaceAll(" ", "_").toLowerCase() + "_" +
                 team.trim().replaceAll(" ", "_").toLowerCase() + "_" +
-                playerId + "_";
+                playerId;
 
     }
 }

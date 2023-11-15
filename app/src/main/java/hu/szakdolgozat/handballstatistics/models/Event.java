@@ -17,6 +17,10 @@ public class Event {
         this.result = result;
     }
 
+    public long getMatchId() {
+        return matchId;
+    }
+
     public long getEventId() {
         return eventId;
     }

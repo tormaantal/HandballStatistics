@@ -2,8 +2,6 @@ package hu.szakdolgozat.handballstatistics.models;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
-
 public class Match {
     private final long matchId;
     private final long playerId;

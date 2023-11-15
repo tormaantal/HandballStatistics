@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +32,6 @@ public class NewMatchActivity extends AppCompatActivity {
     TextView toolbarTV, tvPlayers, tvMatches, tvContact;
     Button startButton, dateButton;
     DrawerLayout newMatchDrawerLayout;
-    LinearLayout navigationDrawer;
     ImageView menuImageView;
     Spinner playerSpinner;
     EditText etOpponent;
@@ -50,8 +48,6 @@ public class NewMatchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_match);
         init();
         initSpinner();
-        navigationDrawer.setOnClickListener(view -> {
-        });
         menuImageView.setOnClickListener(view ->
                 newMatchDrawerLayout.openDrawer(GravityCompat.START)
         );
@@ -79,7 +75,6 @@ public class NewMatchActivity extends AppCompatActivity {
         playerServices = new PlayerServices(this);
         toolbarTV = findViewById(R.id.tvToolbar);
         toolbarTV.setText(R.string.new_match);
-        navigationDrawer = findViewById(R.id.navigationDrawer);
         newMatchDrawerLayout = findViewById(R.id.newMatchDrawerLayout);
         menuImageView = findViewById(R.id.menuImageView);
         tvPlayers = findViewById(R.id.tvPlayers);
