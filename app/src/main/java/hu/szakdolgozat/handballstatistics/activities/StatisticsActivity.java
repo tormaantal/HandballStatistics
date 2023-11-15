@@ -537,7 +537,7 @@ public class StatisticsActivity extends AppCompatActivity {
             }
             Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);
             String[] to = {"t.anti94@gmail.com"};
-            Intent intent = ShareCompat.IntentBuilder.from(this)
+            Intent intent = new ShareCompat.IntentBuilder(this)
                     .setStream(uri)
                     .getIntent()
                     .setAction(Intent.ACTION_SENDTO)
@@ -574,7 +574,7 @@ public class StatisticsActivity extends AppCompatActivity {
         pdfDocument.close();
         Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);
         String[] to = {"t.anti94@gmail.com"};
-        Intent intent = ShareCompat.IntentBuilder.from(this)
+        Intent intent = new ShareCompat.IntentBuilder(this)
                 .setStream(uri)
                 .getIntent()
                 .setAction(Intent.ACTION_SENDTO)

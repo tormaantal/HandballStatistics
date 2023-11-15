@@ -1,6 +1,5 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -132,14 +132,12 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
 
     private void sendEmail() {
         String[] to = {"t.anti94@gmail.com"};
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:"));
-        intent.putExtra(Intent.EXTRA_EMAIL, to);
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
-        }
+        Intent intent = new ShareCompat.IntentBuilder(this)
+                .getIntent()
+                .setAction(Intent.ACTION_SENDTO)
+                .setData(Uri.parse("mailto:"))
+                .putExtra(Intent.EXTRA_EMAIL, to);
+        startActivity(intent);
     }
 
     public void openActivity(Class<?> secondActivity) {

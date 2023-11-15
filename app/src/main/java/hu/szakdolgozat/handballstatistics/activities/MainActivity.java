@@ -1,15 +1,15 @@
 package hu.szakdolgozat.handballstatistics.activities;
 
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -40,6 +40,17 @@ public class MainActivity extends AppCompatActivity {
         tvContact.setOnClickListener(view ->
                 sendEmail()
         );
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.exit)
+                        .setMessage(R.string.exitMsg)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> finish())
+                        .setNegativeButton(R.string.no, (dialogInterface, i) -> dialogInterface.dismiss())
+                        .show();
+            }
+        });
     }
 
     private void initMainActivity() {
@@ -53,14 +64,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendEmail() {
         String[] to = {"t.anti94@gmail.com"};
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:"));
-        intent.putExtra(Intent.EXTRA_EMAIL, to);
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
-        }
+        Intent intent = new ShareCompat.IntentBuilder(this)
+                .getIntent()
+                .setAction(Intent.ACTION_SENDTO)
+                .setData(Uri.parse("mailto:"))
+                .putExtra(Intent.EXTRA_EMAIL, to);
+        startActivity(intent);
     }
 
     public void openActivity(Class<?> secondActivity) {
@@ -74,15 +83,5 @@ public class MainActivity extends AppCompatActivity {
             mainDrawerLayout.closeDrawer(GravityCompat.START);
         }
         super.onPause();
-    }
-
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.exit)
-                .setMessage(R.string.exitMsg)
-                .setPositiveButton(R.string.yes, (dialogInterface, i) -> MainActivity.super.onBackPressed())
-                .setNegativeButton(R.string.no, (dialogInterface, i) -> dialogInterface.dismiss())
-                .show();
     }
 }

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -149,9 +150,11 @@ public class NewMatchActivity extends AppCompatActivity {
 
     private void sendEmail() {
         String[] to = {"t.anti94@gmail.com"};
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:"));
-        intent.putExtra(Intent.EXTRA_EMAIL, to);
+        Intent intent = new ShareCompat.IntentBuilder(this)
+                .getIntent()
+                .setAction(Intent.ACTION_SENDTO)
+                .setData(Uri.parse("mailto:"))
+                .putExtra(Intent.EXTRA_EMAIL, to);
         startActivity(intent);
     }
 

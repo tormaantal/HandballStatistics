@@ -10,6 +10,7 @@ import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,6 +49,23 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
         setContentView(R.layout.activity_started_match);
         init();
         setOnActionListener();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                new android.app.AlertDialog.Builder(StartedMatchActivity.this)
+                        .setTitle("Megkaszítás!")
+                        .setMessage("Biztos megszakítja a mérkőzést? Minden eddigi adatot elveszít!")
+                        .setIcon(R.drawable.baseline_delete_24)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                            matchServices.deleteMatch(matchId);
+                            finish();
+                        })
+                        .setNegativeButton(R.string.no, (dialogInterface, i) ->
+                                dialogInterface.dismiss()
+                        )
+                        .show();
+            }
+        });
     }
 
     private void init() {
@@ -312,22 +330,6 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
 
     private boolean isTypeSelected() {
         return type != null;
-    }
-
-    @Override
-    public void onBackPressed() {
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Megkaszítás!")
-                .setMessage("Biztos megszakítja a mérkőzést? Minden eddigi adatot elveszít!")
-                .setIcon(R.drawable.baseline_delete_24)
-                .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                    matchServices.deleteMatch(matchId);
-                    super.onBackPressed();
-                })
-                .setNegativeButton(R.string.no, (dialogInterface, i) -> {
-
-                })
-                .show();
     }
 
     private String getTime() {
