@@ -28,27 +28,23 @@ import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class NewMatchActivity extends AppCompatActivity {
 
-    MatchServices matchServices;
-    PlayerServices playerServices;
-    TextView toolbarTV, tvPlayers, tvMatches, tvContact;
-    Button startButton, dateButton;
-    DrawerLayout newMatchDrawerLayout;
-    ImageView menuImageView;
-    Spinner playerSpinner;
-    EditText etOpponent;
-    TextInputLayout tilOpponent;
-    long playerId, matchId;
-    StringBuilder date;
-    String opponent;
-    ArrayList<String> adapterList;
-    ArrayAdapter<String> spinnerAdapter;
+    private MatchServices matchServices;
+    private PlayerServices playerServices;
+    private TextView tvPlayers, tvMatches, tvContact;
+    private Button startButton, dateButton;
+    private DrawerLayout newMatchDrawerLayout;
+    private ImageView menuImageView;
+    private Spinner playerSpinner;
+    private EditText etOpponent;
+    private TextInputLayout tilOpponent;
+    private StringBuilder date;
+    private ArrayList<String> adapterList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_match);
         init();
-        initSpinner();
         menuImageView.setOnClickListener(view ->
                 newMatchDrawerLayout.openDrawer(GravityCompat.START)
         );
@@ -74,7 +70,7 @@ public class NewMatchActivity extends AppCompatActivity {
     private void init() {
         matchServices = new MatchServices(this);
         playerServices = new PlayerServices(this);
-        toolbarTV = findViewById(R.id.tvToolbar);
+        TextView toolbarTV = findViewById(R.id.tvToolbar);
         toolbarTV.setText(R.string.new_match);
         newMatchDrawerLayout = findViewById(R.id.newMatchDrawerLayout);
         menuImageView = findViewById(R.id.menuImageView);
@@ -86,13 +82,10 @@ public class NewMatchActivity extends AppCompatActivity {
         startButton = findViewById(R.id.startButton);
         playerSpinner = findViewById(R.id.playerSpinner);
         dateButton = findViewById(R.id.dateButton);
-    }
-
-    public void initSpinner() {
         adapterList = new ArrayList<>();
         adapterList.add("Válassz egy játékost!");
         playerServices.findAllPlayer().forEach(player -> adapterList.add(player.getName() + " (" + player.getId() + ")"));
-        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, adapterList);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, adapterList);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         playerSpinner.setAdapter(spinnerAdapter);
     }
@@ -110,14 +103,11 @@ public class NewMatchActivity extends AppCompatActivity {
             tilOpponent.setError("Nem lehet üres!");
             return;
         }
-        playerId = playerServices.findAllPlayer().get(playerSpinner.getSelectedItemPosition() - 1).getId();
-        opponent = etOpponent.getText().toString().trim();
-        matchId = matchServices.addMatch(playerId, date.toString(), opponent);
+        long playerId = playerServices.findAllPlayer().get(playerSpinner.getSelectedItemPosition() - 1).getId();
+        String opponent = etOpponent.getText().toString().trim();
+        long matchId = matchServices.addMatch(playerId, date.toString(), opponent);
         if (matchId > 0) {
             Intent intent = new Intent(this, StartedMatchActivity.class);
-            intent.putExtra("playerId", playerId);
-            intent.putExtra("date", date.toString());
-            intent.putExtra("opponent", opponent);
             intent.putExtra("matchId", matchId);
             startActivity(intent);
         } else {

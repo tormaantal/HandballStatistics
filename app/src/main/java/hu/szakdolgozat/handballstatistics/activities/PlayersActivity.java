@@ -27,16 +27,14 @@ import hu.szakdolgozat.handballstatistics.models.Player;
 import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class PlayersActivity extends AppCompatActivity implements RecyclerViewInterface {
-    PlayerServices playerServices;
-    DrawerLayout playersDrawerLayout;
-    ImageView menuImageView, addPlayerImageView;
-    TextView tvToolbar, tvNewMatch, tvMatches, tvContact;
-    TextInputLayout tilPlayerId, tilPlayerName, tilPlayerTeam;
-    EditText etPlayerId, etPlayerName, etPlayerTeam;
-    Button addPlayerButton;
-    AlertDialog dialog;
-    RecyclerView playersRecyclerView;
-    RecyclerViewPlayersAdapter adapter;
+    private PlayerServices playerServices;
+    private DrawerLayout playersDrawerLayout;
+    private ImageView menuImageView, addPlayerImageView;
+    private TextView tvNewMatch, tvMatches, tvContact;
+    private TextInputLayout tilPlayerId, tilPlayerName, tilPlayerTeam;
+    private EditText etPlayerId, etPlayerName, etPlayerTeam;
+    private AlertDialog dialog;
+    private RecyclerViewPlayersAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +62,7 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
 
     private void init() {
         playerServices = new PlayerServices(this);
-        tvToolbar = findViewById(R.id.tvToolbar);
+        TextView tvToolbar = findViewById(R.id.tvToolbar);
         tvToolbar.setText(R.string.players);
         playersDrawerLayout = findViewById(R.id.playersDrawerLayout);
         menuImageView = findViewById(R.id.menuImageView);
@@ -72,7 +70,7 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
         tvNewMatch = findViewById(R.id.tvNewMatch);
         tvMatches = findViewById(R.id.tvMatches);
         tvContact = findViewById(R.id.tvContact);
-        playersRecyclerView = findViewById(R.id.playersRecyclerView);
+        RecyclerView playersRecyclerView = findViewById(R.id.playersRecyclerView);
         addPlayerImageView.setVisibility(View.VISIBLE);
         adapter = new RecyclerViewPlayersAdapter(this, playerServices.findAllPlayer(), this);
         playersRecyclerView.setAdapter(adapter);
@@ -86,7 +84,7 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
         builder.setView(view1);
         dialog = builder.create();
         dialog.show();
-        addPlayerButton = dialog.findViewById(R.id.addPlayerButton);
+        Button addPlayerButton = dialog.findViewById(R.id.addPlayerButton);
         etPlayerId = dialog.findViewById(R.id.etPlayerId);
         etPlayerName = dialog.findViewById(R.id.etPlayerName);
         etPlayerTeam = dialog.findViewById(R.id.etPlayerTeam);

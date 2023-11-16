@@ -27,20 +27,19 @@ import hu.szakdolgozat.handballstatistics.services.MatchServices;
 
 public class StartedMatchActivity extends AppCompatActivity implements RecyclerViewInterface {
 
-    MatchServices matchServices;
-    EventServices eventServices;
-    NumberPicker npMinutes;
-    ImageView addSave, addGoal;
-    Button endMatch, addYellowCard, addTwoMinutes, addRedCard, addBlueCard;
-    RadioButton rbLeftWing, rbLeftBack, rbPivot, rbSevenMeters, rbCentralBack,
+    private MatchServices matchServices;
+    private EventServices eventServices;
+    private NumberPicker npMinutes;
+    private ImageView addSave, addGoal;
+    private Button endMatch, addYellowCard, addTwoMinutes, addRedCard, addBlueCard;
+    private RadioButton rbLeftWing, rbLeftBack, rbPivot, rbSevenMeters, rbCentralBack,
             rbRightBack, rbRightWing, rbBreakIn, rbFastBreak;
-    long playerId, matchId, eventId;
-    String date, opponent;
-    ArrayList<Event> events;
-    EventType type;
-    RecyclerView recyclerView;
-    RecyclerViewEventsAdapter adapter;
-    private int twominutes;
+    private long matchId, eventId;
+    private ArrayList<Event> events;
+    private EventType type;
+    private RecyclerView recyclerView;
+    private RecyclerViewEventsAdapter adapter;
+    private int twoMinutes;
 
 
     @Override
@@ -71,9 +70,6 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
     private void init() {
         matchServices = new MatchServices(this);
         eventServices = new EventServices(this);
-        playerId = getIntent().getLongExtra("playerId", -1);
-        date = getIntent().getStringExtra("date");
-        opponent = getIntent().getStringExtra("opponent");
         matchId = getIntent().getLongExtra("matchId", -1);
         events = new ArrayList<>();
         addGoal = findViewById(R.id.addGoal);
@@ -96,7 +92,7 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
         rbBreakIn = findViewById(R.id.rbBreakIn);
         rbFastBreak = findViewById(R.id.rbFastBreak);
         recyclerView = findViewById(R.id.statisticsRecyclerView);
-        twominutes = 0;
+        twoMinutes = 0;
         events = new ArrayList<>();
         adapter = new RecyclerViewEventsAdapter(this, events, this);
         recyclerView.setAdapter(adapter);
@@ -264,7 +260,7 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
             addYellowCard.setAlpha(0.5F);
         });
         addTwoMinutes.setOnClickListener(view -> {
-            if (++twominutes == 3) {
+            if (++twoMinutes == 3) {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.redCard)
                         .setMessage("A játékost véglegesen kiállították!")
@@ -355,7 +351,7 @@ public class StartedMatchActivity extends AppCompatActivity implements RecyclerV
                             addYellowCard.setAlpha(1.0F);
                         }
                         if (events.get(position).getResult() == 3) {
-                            twominutes--;
+                            twoMinutes--;
                         }
                         events.remove(position);
                         adapter.notifyItemRemoved(position);

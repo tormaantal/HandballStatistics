@@ -45,9 +45,9 @@ import hu.szakdolgozat.handballstatistics.services.MatchServices;
 import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class MatchesActivity extends AppCompatActivity implements RecyclerViewInterface {
-    PlayerServices playerServices;
-    MatchServices matchServices;
-    EventServices eventServices;
+    private PlayerServices playerServices;
+    private MatchServices matchServices;
+    private EventServices eventServices;
     private final ActivityResultLauncher<Intent> startPickJson = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -81,11 +81,10 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
                             Toast.makeText(MatchesActivity.this, "Storage Permissions Denied", Toast.LENGTH_SHORT).show();
                         }
                     });
-    TextView tvToolbar, tvNewMatch, tvPlayers, tvContact;
-    DrawerLayout matchesDrawerLayout;
-    ImageView menuImageView, addMatchImageView;
-    RecyclerView matchRecyclerView;
-    RecyclerViewMatchesAdapter adapter;
+    private TextView tvNewMatch, tvPlayers, tvContact;
+    private DrawerLayout matchesDrawerLayout;
+    private ImageView menuImageView, addMatchImageView;
+    private RecyclerViewMatchesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +123,7 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
         playerServices = new PlayerServices(this);
         matchServices = new MatchServices(this);
         eventServices = new EventServices(this);
-        tvToolbar = findViewById(R.id.tvToolbar);
+        TextView tvToolbar = findViewById(R.id.tvToolbar);
         tvToolbar.setText(R.string.matches);
         matchesDrawerLayout = findViewById(R.id.matchesDrawerLayout);
         menuImageView = findViewById(R.id.menuImageView);
@@ -132,7 +131,7 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
         tvPlayers = findViewById(R.id.tvPlayers);
         tvNewMatch = findViewById(R.id.tvNewMatch);
         tvContact = findViewById(R.id.tvContact);
-        matchRecyclerView = findViewById(R.id.matchesRecyclerView);
+        RecyclerView matchRecyclerView = findViewById(R.id.matchesRecyclerView);
         addMatchImageView.setVisibility(View.VISIBLE);
         adapter = new RecyclerViewMatchesAdapter(this, matchServices.findAllMatch(), this);
         matchRecyclerView.setAdapter(adapter);

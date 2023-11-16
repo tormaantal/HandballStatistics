@@ -16,9 +16,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import hu.szakdolgozat.handballstatistics.R;
 
 public class MainActivity extends AppCompatActivity {
-    DrawerLayout mainDrawerLayout;
-    ImageView menu;
-    TextView tvNewMatch, tvPlayers, tvMatches, tvContact;
+    private DrawerLayout mainDrawerLayout;
+    private ImageView menu;
+    private TextView tvNewMatch, tvPlayers, tvMatches, tvContact;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -451,7 +451,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Event> findAllEventByMatchId(long matchId) {
-
         ArrayList<Event> returnList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + EVENTS_TABLE_NAME +
