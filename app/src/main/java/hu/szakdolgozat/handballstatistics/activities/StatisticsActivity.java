@@ -26,14 +26,14 @@ import java.util.Objects;
 import hu.szakdolgozat.handballstatistics.R;
 import hu.szakdolgozat.handballstatistics.models.EventType;
 import hu.szakdolgozat.handballstatistics.models.Match;
-import hu.szakdolgozat.handballstatistics.services.ExportService;
+import hu.szakdolgozat.handballstatistics.services.ImpExpService;
 import hu.szakdolgozat.handballstatistics.services.MatchServices;
 import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class StatisticsActivity extends AppCompatActivity {
     private PlayerServices playerServices;
     private MatchServices matchServices;
-    private ExportService exportService;
+    private ImpExpService impExpService;
     private long playerId, matchId, save, goal;
     private int exportType;
     private final ActivityResultLauncher<Intent> storageActivityResultLauncher =
@@ -42,16 +42,16 @@ public class StatisticsActivity extends AppCompatActivity {
                         if (checkPermission()) {
                             switch (exportType) {
                                 case 1:
-                                    exportService.generatePlayerPdf();
+                                    impExpService.generatePlayerPdf();
                                     break;
                                 case 2:
-                                    exportService.generatePlayerJson();
+                                    impExpService.generatePlayerJson();
                                     break;
                                 case 3:
-                                    exportService.generateMatchPdf();
+                                    impExpService.generateMatchPdf();
                                     break;
                                 case 4:
-                                    exportService.generateMatchJson();
+                                    impExpService.generateMatchJson();
                                     break;
                             }
                             Log.d("TAG", "onActivityResult: Manage External Storage Permissions Granted");
@@ -101,7 +101,7 @@ public class StatisticsActivity extends AppCompatActivity {
         matchId = getIntent().getLongExtra("matchId", -1);
         playerServices = new PlayerServices(this);
         matchServices = new MatchServices(this);
-        exportService = new ExportService(this, playerId, matchId);
+        impExpService = new ImpExpService(this, playerId, matchId);
         expEmail = findViewById(R.id.expEmail);
         expJson = findViewById(R.id.expJson);
         expPdf = findViewById(R.id.expPdf);
@@ -285,26 +285,26 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private void exportPlayer() {
         expPdf.setOnClickListener(v -> {
-            if (checkPermission()) {
+            if (!checkPermission()) {
                 exportType = 1;
                 requestPermission();
             } else {
-                exportService.generatePlayerPdf();
+                impExpService.generatePlayerPdf();
             }
         });
         expJson.setOnClickListener(v -> {
-            if (checkPermission()) {
+            if (!checkPermission()) {
                 exportType = 2;
                 requestPermission();
             } else {
-                exportService.generatePlayerJson();
+                impExpService.generatePlayerJson();
             }
         });
         expEmail.setOnClickListener(v -> {
-            if (checkPermission()) {
+            if (!checkPermission()) {
                 requestPermission();
             } else {
-                File file = exportService.generatePlayerPdfToEmail();
+                File file = impExpService.generatePlayerPdfToEmail();
                 if (file != null) {
                     sendPdfInEmail(file);
                 } else {
@@ -316,26 +316,26 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private void exportMatch() {
         expPdf.setOnClickListener(v -> {
-            if (checkPermission()) {
+            if (!checkPermission()) {
                 exportType = 3;
                 requestPermission();
             } else {
-                exportService.generateMatchPdf();
+                impExpService.generateMatchPdf();
             }
         });
         expJson.setOnClickListener(v -> {
-            if (checkPermission()) {
+            if (!checkPermission()) {
                 exportType = 4;
                 requestPermission();
             } else {
-                exportService.generateMatchJson();
+                impExpService.generateMatchJson();
             }
         });
         expEmail.setOnClickListener(v -> {
-            if (checkPermission()) {
+            if (!checkPermission()) {
                 requestPermission();
             } else {
-                File file = exportService.generateMatchPdfToEmail();
+                File file = impExpService.generateMatchPdfToEmail();
                 if (file != null) {
                     sendPdfInEmail(file);
                 } else {

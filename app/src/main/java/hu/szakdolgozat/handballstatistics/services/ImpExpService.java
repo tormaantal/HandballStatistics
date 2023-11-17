@@ -11,15 +11,21 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import hu.szakdolgozat.handballstatistics.R;
 import hu.szakdolgozat.handballstatistics.models.Event;
@@ -27,26 +33,33 @@ import hu.szakdolgozat.handballstatistics.models.EventType;
 import hu.szakdolgozat.handballstatistics.models.Match;
 import hu.szakdolgozat.handballstatistics.models.Player;
 
-public class ExportService {
+public class ImpExpService {
     private static final EventType[] eventTypes = {
             EventType.LEFTWING, EventType.LEFTBACK, EventType.CENTERBACK,
             EventType.RIGHTBACK, EventType.RIGHTWING, EventType.PIVOT,
             EventType.FASTBREAK, EventType.BREAKIN, EventType.SEVENMETERS
     };
-    private final Context context;
     private final MatchServices matchServices;
     private final PlayerServices playerServices;
     private final EventServices eventServices;
-    private final long playerId;
-    private final long matchId;
+    private final Context context;
+    private long playerId = 0;
+    private long matchId = 0;
 
-    public ExportService(Context context, long playerId, long matchId) {
+    public ImpExpService(Context context, long playerId, long matchId) {
         this.context = context;
         this.playerId = playerId;
         this.matchId = matchId;
-        matchServices = new MatchServices(context);
-        playerServices = new PlayerServices(context);
-        eventServices = new EventServices(context);
+        matchServices = new MatchServices(this.context);
+        playerServices = new PlayerServices(this.context);
+        eventServices = new EventServices(this.context);
+    }
+
+    public ImpExpService(Context context) {
+        this.context = context;
+        matchServices = new MatchServices(this.context);
+        playerServices = new PlayerServices(this.context);
+        eventServices = new EventServices(this.context);
     }
 
     public void generatePlayerJson() {
@@ -221,6 +234,78 @@ public class ExportService {
         }
         pdfDocument.close();
         return file;
+    }
+
+    public void readJsonFile(String fileName) {
+        JsonObject combinedJson = null;
+        File externalDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(externalDir, fileName);
+        try (Reader reader = new FileReader(file)) {
+            combinedJson = JsonParser.parseReader(reader).getAsJsonObject();
+        } catch (IOException e) {
+            Log.e("readJsonFile", "exp catch:" + e);
+        }
+        if (combinedJson != null) {
+            Gson gson = new Gson();
+            Type listTypeMatch = new TypeToken<List<Match>>() {
+            }.getType();
+            Type listTypeEvent = new TypeToken<List<Event>>() {
+            }.getType();
+            Player player = gson.fromJson(combinedJson.get("Player"), Player.class);
+            try {
+                Match oldMatch = gson.fromJson(combinedJson.get("Matches"), Match.class);
+                List<Event> events = combinedJson.has("Events") ? gson.fromJson(combinedJson.getAsJsonArray("Events"), listTypeEvent) : null;
+                if (playerServices.findPlayerById(player.getId()) != null) {
+                    long newMatchId = matchServices.addMatch(player.getId(), oldMatch.getDate(), oldMatch.getOpponent());
+                    assert events != null;
+                    events.forEach(event -> {
+                        if (event.getMatchId() == oldMatch.getMatchId()) {
+                            eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
+                        }
+                    });
+                } else {
+                    playerServices.addPlayer(player.getId(), player.getName(), player.getTeam());
+                    long newMatchId = matchServices.addMatch(player.getId(), oldMatch.getDate(), oldMatch.getOpponent());
+                    assert events != null;
+                    events.forEach(event -> {
+                        if (event.getMatchId() == oldMatch.getMatchId()) {
+                            eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
+                        }
+                    });
+                }
+                Toast.makeText(context, "Adatok importálva!", Toast.LENGTH_SHORT).show();
+            } catch (JsonSyntaxException e) {
+                List<Match> matches = combinedJson.has("Matches") ? gson.fromJson(combinedJson.getAsJsonArray("Matches"), listTypeMatch) : null;
+                List<Event> events = combinedJson.has("Events") ? gson.fromJson(combinedJson.getAsJsonArray("Events"), listTypeEvent) : null;
+                if (playerServices.findPlayerById(player.getId()) != null) {
+                    assert matches != null;
+                    matches.forEach(oldMatch -> {
+                        long newMatchId = matchServices.addMatch(player.getId(), oldMatch.getDate(), oldMatch.getOpponent());
+                        assert events != null;
+                        events.forEach(event -> {
+                            if (event.getMatchId() == oldMatch.getMatchId()) {
+                                eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
+                            }
+                        });
+                    });
+                } else {
+                    playerServices.addPlayer(player.getId(), player.getName(), player.getTeam());
+                    assert matches != null;
+                    matches.forEach(match -> {
+                        long newMatchId = matchServices.addMatch(player.getId(), match.getDate(), match.getOpponent());
+                        assert events != null;
+                        events.forEach(event -> {
+                            if (event.getMatchId() == match.getMatchId()) {
+                                eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
+                            }
+                        });
+                    });
+                }
+                Toast.makeText(context, "Adatok importálva!", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(context, "Nincs adat!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void drawTitle(PdfDocument.Page page, String title) {

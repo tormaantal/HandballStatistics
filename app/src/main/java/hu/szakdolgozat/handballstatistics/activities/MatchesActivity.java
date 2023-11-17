@@ -41,6 +41,7 @@ import hu.szakdolgozat.handballstatistics.models.Event;
 import hu.szakdolgozat.handballstatistics.models.Match;
 import hu.szakdolgozat.handballstatistics.models.Player;
 import hu.szakdolgozat.handballstatistics.services.EventServices;
+import hu.szakdolgozat.handballstatistics.services.ImpExpService;
 import hu.szakdolgozat.handballstatistics.services.MatchServices;
 import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
@@ -48,6 +49,7 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
     private PlayerServices playerServices;
     private MatchServices matchServices;
     private EventServices eventServices;
+    private ImpExpService impExpService;
     private final ActivityResultLauncher<Intent> startPickJson = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -58,7 +60,8 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
                         if (uri != null) {
                             assert uri.getPath() != null;
                             String fileName = uri.getPath().substring(uri.getPath().lastIndexOf("/") + 1);
-                            readJsonFile(fileName);
+                            impExpService.readJsonFile(fileName);
+                            recreate();
                         }
                     }
                 } else {
@@ -123,6 +126,7 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
         playerServices = new PlayerServices(this);
         matchServices = new MatchServices(this);
         eventServices = new EventServices(this);
+        impExpService = new ImpExpService(this);
         TextView tvToolbar = findViewById(R.id.tvToolbar);
         tvToolbar.setText(R.string.matches);
         matchesDrawerLayout = findViewById(R.id.matchesDrawerLayout);
