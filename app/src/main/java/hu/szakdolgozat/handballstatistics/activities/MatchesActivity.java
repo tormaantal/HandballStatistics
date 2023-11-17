@@ -21,34 +21,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.lang.reflect.Type;
-import java.util.List;
-
 import hu.szakdolgozat.handballstatistics.R;
 import hu.szakdolgozat.handballstatistics.RecyclerViewInterface;
 import hu.szakdolgozat.handballstatistics.adapters.RecyclerViewMatchesAdapter;
-import hu.szakdolgozat.handballstatistics.models.Event;
-import hu.szakdolgozat.handballstatistics.models.Match;
-import hu.szakdolgozat.handballstatistics.models.Player;
-import hu.szakdolgozat.handballstatistics.services.EventServices;
 import hu.szakdolgozat.handballstatistics.services.ImpExpService;
 import hu.szakdolgozat.handballstatistics.services.MatchServices;
-import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class MatchesActivity extends AppCompatActivity implements RecyclerViewInterface {
-    private PlayerServices playerServices;
     private MatchServices matchServices;
-    private EventServices eventServices;
     private ImpExpService impExpService;
     private final ActivityResultLauncher<Intent> startPickJson = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -123,9 +103,7 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
     }
 
     private void init() {
-        playerServices = new PlayerServices(this);
         matchServices = new MatchServices(this);
-        eventServices = new EventServices(this);
         impExpService = new ImpExpService(this);
         TextView tvToolbar = findViewById(R.id.tvToolbar);
         tvToolbar.setText(R.string.matches);
@@ -140,80 +118,6 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
         adapter = new RecyclerViewMatchesAdapter(this, matchServices.findAllMatch(), this);
         matchRecyclerView.setAdapter(adapter);
         matchRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
-
-    private void readJsonFile(String fileName) {
-        JsonObject combinedJson = null;
-        File externalDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(externalDir, fileName);
-        try (Reader reader = new FileReader(file)) {
-            combinedJson = JsonParser.parseReader(reader).getAsJsonObject();
-        } catch (IOException e) {
-            Log.e("readJsonFile", "exp catch:" + e);
-        }
-        if (combinedJson != null) {
-            Gson gson = new Gson();
-            Type listTypeMatch = new TypeToken<List<Match>>() {
-            }.getType();
-            Type listTypeEvent = new TypeToken<List<Event>>() {
-            }.getType();
-            Player player = gson.fromJson(combinedJson.get("Player"), Player.class);
-            try {
-                Match oldMatch = gson.fromJson(combinedJson.get("Matches"), Match.class);
-                List<Event> events = combinedJson.has("Events") ? gson.fromJson(combinedJson.getAsJsonArray("Events"), listTypeEvent) : null;
-                if (playerServices.findPlayerById(player.getId()) != null) {
-                    long newMatchId = matchServices.addMatch(player.getId(), oldMatch.getDate(), oldMatch.getOpponent());
-                    assert events != null;
-                    events.forEach(event -> {
-                        if (event.getMatchId() == oldMatch.getMatchId()) {
-                            eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
-                        }
-                    });
-                } else {
-                    playerServices.addPlayer(player.getId(), player.getName(), player.getTeam());
-                    long newMatchId = matchServices.addMatch(player.getId(), oldMatch.getDate(), oldMatch.getOpponent());
-                    assert events != null;
-                    events.forEach(event -> {
-                        if (event.getMatchId() == oldMatch.getMatchId()) {
-                            eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
-                        }
-                    });
-                }
-                Toast.makeText(this, "Adatok importálva!", Toast.LENGTH_SHORT).show();
-                recreate();
-            } catch (JsonSyntaxException e) {
-                List<Match> matches = combinedJson.has("Matches") ? gson.fromJson(combinedJson.getAsJsonArray("Matches"), listTypeMatch) : null;
-                List<Event> events = combinedJson.has("Events") ? gson.fromJson(combinedJson.getAsJsonArray("Events"), listTypeEvent) : null;
-                if (playerServices.findPlayerById(player.getId()) != null) {
-                    assert matches != null;
-                    matches.forEach(oldMatch -> {
-                        long newMatchId = matchServices.addMatch(player.getId(), oldMatch.getDate(), oldMatch.getOpponent());
-                        assert events != null;
-                        events.forEach(event -> {
-                            if (event.getMatchId() == oldMatch.getMatchId()) {
-                                eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
-                            }
-                        });
-                    });
-                } else {
-                    playerServices.addPlayer(player.getId(), player.getName(), player.getTeam());
-                    assert matches != null;
-                    matches.forEach(match -> {
-                        long newMatchId = matchServices.addMatch(player.getId(), match.getDate(), match.getOpponent());
-                        assert events != null;
-                        events.forEach(event -> {
-                            if (event.getMatchId() == match.getMatchId()) {
-                                eventServices.addEvent(newMatchId, event.getTime(), event.getType(), event.getResult());
-                            }
-                        });
-                    });
-                }
-                Toast.makeText(this, "Adatok importálva!", Toast.LENGTH_SHORT).show();
-                recreate();
-            }
-        } else {
-            Toast.makeText(this, "No data found!", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void requestPermission() {
