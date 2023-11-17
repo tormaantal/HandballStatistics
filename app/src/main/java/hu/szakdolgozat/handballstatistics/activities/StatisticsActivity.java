@@ -2,9 +2,6 @@ package hu.szakdolgozat.handballstatistics.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,38 +18,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Objects;
 
 import hu.szakdolgozat.handballstatistics.R;
-import hu.szakdolgozat.handballstatistics.models.Event;
 import hu.szakdolgozat.handballstatistics.models.EventType;
 import hu.szakdolgozat.handballstatistics.models.Match;
-import hu.szakdolgozat.handballstatistics.models.Player;
-import hu.szakdolgozat.handballstatistics.services.EventServices;
+import hu.szakdolgozat.handballstatistics.services.ExportService;
 import hu.szakdolgozat.handballstatistics.services.MatchServices;
 import hu.szakdolgozat.handballstatistics.services.PlayerServices;
 
 public class StatisticsActivity extends AppCompatActivity {
-    private static final EventType[] eventTypes = {
-            EventType.LEFTWING, EventType.LEFTBACK, EventType.CENTERBACK,
-            EventType.RIGHTBACK, EventType.RIGHTWING, EventType.PIVOT,
-            EventType.FASTBREAK, EventType.BREAKIN, EventType.SEVENMETERS
-    };
     private PlayerServices playerServices;
     private MatchServices matchServices;
-    private EventServices eventServices;
+    private ExportService exportService;
     private long playerId, matchId, save, goal;
     private int exportType;
     private final ActivityResultLauncher<Intent> storageActivityResultLauncher =
@@ -61,21 +42,21 @@ public class StatisticsActivity extends AppCompatActivity {
                         if (checkPermission()) {
                             switch (exportType) {
                                 case 1:
-                                    generatePlayerPdf();
+                                    exportService.generatePlayerPdf();
                                     break;
                                 case 2:
-                                    generatePlayerJson();
+                                    exportService.generatePlayerJson();
                                     break;
                                 case 3:
-                                    generateMatchPdf();
+                                    exportService.generateMatchPdf();
                                     break;
                                 case 4:
-                                    generateMatchJson();
+                                    exportService.generateMatchJson();
                                     break;
                             }
                             Log.d("TAG", "onActivityResult: Manage External Storage Permissions Granted");
                         } else {
-                            Toast.makeText(StatisticsActivity.this, "Storage Permissions Denied", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StatisticsActivity.this, "Hozzáférés megtagadva", Toast.LENGTH_SHORT).show();
                         }
                     });
     private double efficiency;
@@ -115,13 +96,12 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void init() {
-        playerServices = new PlayerServices(this);
-        matchServices = new MatchServices(this);
-        eventServices = new EventServices(this);
-        formatter = new DecimalFormat("#0.0");
         methodType = getIntent().getStringExtra("methodType");
         playerId = getIntent().getLongExtra("playerId", -1);
         matchId = getIntent().getLongExtra("matchId", -1);
+        playerServices = new PlayerServices(this);
+        matchServices = new MatchServices(this);
+        exportService = new ExportService(this, playerId, matchId);
         expEmail = findViewById(R.id.expEmail);
         expJson = findViewById(R.id.expJson);
         expPdf = findViewById(R.id.expPdf);
@@ -161,6 +141,7 @@ public class StatisticsActivity extends AppCompatActivity {
         tvYellowCard = findViewById(R.id.yellowCard);
         tvRedCard = findViewById(R.id.redCard);
         tvBlueCard = findViewById(R.id.blueCard);
+        formatter = new DecimalFormat("#0.0");
     }
 
     @SuppressLint("SetTextI18n")
@@ -308,7 +289,7 @@ public class StatisticsActivity extends AppCompatActivity {
                 exportType = 1;
                 requestPermission();
             } else {
-                generatePlayerPdf();
+                exportService.generatePlayerPdf();
             }
         });
         expJson.setOnClickListener(v -> {
@@ -316,14 +297,19 @@ public class StatisticsActivity extends AppCompatActivity {
                 exportType = 2;
                 requestPermission();
             } else {
-                generatePlayerJson();
+                exportService.generatePlayerJson();
             }
         });
         expEmail.setOnClickListener(v -> {
             if (checkPermission()) {
                 requestPermission();
             } else {
-                generatePlayerPdfToEmail();
+                File file = exportService.generatePlayerPdfToEmail();
+                if (file != null) {
+                    sendPdfInEmail(file);
+                } else {
+                    Toast.makeText(this, "Hiba a fájl csatolásánál!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -334,7 +320,7 @@ public class StatisticsActivity extends AppCompatActivity {
                 exportType = 3;
                 requestPermission();
             } else {
-                generateMatchPdf();
+                exportService.generateMatchPdf();
             }
         });
         expJson.setOnClickListener(v -> {
@@ -342,16 +328,35 @@ public class StatisticsActivity extends AppCompatActivity {
                 exportType = 4;
                 requestPermission();
             } else {
-                generateMatchJson();
+                exportService.generateMatchJson();
             }
         });
         expEmail.setOnClickListener(v -> {
             if (checkPermission()) {
                 requestPermission();
             } else {
-                generateMatchPdfToEmail();
+                File file = exportService.generateMatchPdfToEmail();
+                if (file != null) {
+                    sendPdfInEmail(file);
+                } else {
+                    Toast.makeText(this, "Hiba a fájl csatolásánál!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+
+    private void sendPdfInEmail(File file) {
+        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);
+        String[] to = {"t.anti94@gmail.com"};
+        Intent intent = new ShareCompat.IntentBuilder(this)
+                .setStream(uri)
+                .getIntent()
+                .setAction(Intent.ACTION_SENDTO)
+                .setData(Uri.parse("mailto:"))
+                .putExtra(Intent.EXTRA_EMAIL, to)
+                .putExtra(Intent.EXTRA_SUBJECT, playerServices.findPlayerById(playerId).toString())
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
     }
 
     private void requestPermission() {
@@ -371,318 +376,5 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private boolean checkPermission() {
         return Environment.isExternalStorageManager();
-    }
-
-    private void generatePlayerJson() {
-        ArrayList<Match> matches = matchServices.findAllMatchByPlayerId(playerId);
-        if (matches.isEmpty()) {
-            Toast.makeText(this, "Nincs adat!", Toast.LENGTH_SHORT).show();
-        } else {
-            Player player = playerServices.findPlayerById(playerId);
-            ArrayList<Event> events = new ArrayList<>();
-            matches.forEach(m -> events.addAll(eventServices.findAllEventByMatchId(m.getMatchId())));
-            String fileName = player.getFileName() + "_ALL_" +
-                    System.currentTimeMillis() + ".json";
-            Gson gson = new Gson();
-            String jsonPlayer = gson.toJson(player);
-            String jsonMatches = gson.toJson(matches);
-            String jsonEvents = gson.toJson(events);
-            JsonObject combinedJson = new JsonObject();
-            combinedJson.add("Player", JsonParser.parseString(jsonPlayer));
-            combinedJson.add("Matches", JsonParser.parseString(jsonMatches));
-            combinedJson.add("Events", JsonParser.parseString(jsonEvents));
-            File externalDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File file = new File(externalDir, fileName);
-            try (Writer writer = new FileWriter(file)) {
-                gson.toJson(combinedJson, writer);
-                Toast.makeText(this, "Done" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                Log.e("generatePlayerJson", "exception catch: " + e);
-            }
-        }
-    }
-
-    private void generateMatchJson() {
-        Player player = playerServices.findPlayerById(playerId);
-        Match matches = matchServices.findMatchById(matchId);
-        ArrayList<Event> events = eventServices.findAllEventByMatchId(matchId);
-        String fileName = player.getFileName() + matches.getDate() + "_" + matches.getOpponent() + "_" +
-                System.currentTimeMillis() + ".json";
-        Gson gson = new Gson();
-        String jsonPlayer = gson.toJson(player);
-        String jsonMatches = gson.toJson(matches);
-        String jsonEvents = gson.toJson(events);
-        JsonObject combinedJson = new JsonObject();
-        combinedJson.add("Player", JsonParser.parseString(jsonPlayer));
-        combinedJson.add("Matches", JsonParser.parseString(jsonMatches));
-        combinedJson.add("Events", JsonParser.parseString(jsonEvents));
-        File externalDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(externalDir, fileName);
-        try (Writer writer = new FileWriter(file)) {
-            gson.toJson(combinedJson, writer);
-            Toast.makeText(this, getString(R.string.done) + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Log.e("generateMatchJson", "exception catch" + e);
-        }
-    }
-
-    private void generatePlayerPdf() {
-        ArrayList<Match> matches = matchServices.findAllMatchByPlayerId(playerId);
-        if (matches.isEmpty()) {
-            Toast.makeText(this, "Nincs adat! Előbb rögzítsen mérkőzést az adott játékoshoz!", Toast.LENGTH_SHORT).show();
-        } else {
-            Player player = playerServices.findPlayerById(playerId);
-            PdfDocument pdfDocument = new PdfDocument();
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-            String fileName = player.getFileName() + "_ALL_" + System.currentTimeMillis() + ".pdf";
-            File externalDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File file = new File(externalDir, fileName);
-            drawTitle(page, player + " összesített adatok");
-            drawTable(page, setDataPlayer(playerId));
-            pdfDocument.finishPage(page);
-            try {
-                pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-                matches.forEach(match -> {
-                    String t = player + " vs " + match.getOpponent() + " (" + match.getDate() + ")";
-                    PdfDocument.Page p = pdfDocument.startPage(pageInfo);
-                    drawTitle(p, t);
-                    drawTable(p, setDataMatch(match.getMatchId()));
-                    pdfDocument.finishPage(p);
-                    try {
-                        pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-                    } catch (IOException e) {
-                        Log.e("TAG", e.toString());
-                    }
-                });
-                pdfDocument.close();
-                Toast.makeText(this, getString(R.string.done) + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                Log.e("generatePlayerPdf", "exception catch: " + e);
-            }
-        }
-    }
-
-    private void generateMatchPdf() {
-        Player player = playerServices.findPlayerById(playerId);
-        Match match = matchServices.findMatchById(matchId);
-        PdfDocument pdfDocument = new PdfDocument();
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-        String fileName = player.getFileName() + "_vs_" +
-                match.getOpponent().trim() + "_" +
-                System.currentTimeMillis() + ".pdf";
-        File externalDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(externalDir, fileName);
-        try {
-            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-            drawTitle(page, player + " vs " + match.getOpponent() + "(" + match.getDate() + ")");
-            drawTable(page, setDataMatch(match.getMatchId()));
-            pdfDocument.finishPage(page);
-            pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-            Toast.makeText(this, getString(R.string.done) + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Log.e("generateMatchPdf", "exp catch: " + e);
-        }
-        pdfDocument.close();
-    }
-
-    private void generatePlayerPdfToEmail() {
-        ArrayList<Match> matches = matchServices.findAllMatchByPlayerId(playerId);
-        if (matches.isEmpty()) {
-            Toast.makeText(this, "Nincs adat! Előbb rögzítsen mérkőzést az adott játékoshoz!", Toast.LENGTH_SHORT).show();
-        } else {
-            Player player = playerServices.findPlayerById(playerId);
-            PdfDocument pdfDocument = new PdfDocument();
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-            String fileName = player.getFileName() + "_ALL_" + System.currentTimeMillis() + ".pdf";
-            File externalDir = new File(getFilesDir().getAbsolutePath());
-            File file = new File(externalDir, fileName);
-            drawTitle(page, player + " összesített adatok");
-            drawTable(page, setDataPlayer(playerId));
-            pdfDocument.finishPage(page);
-            try {
-                pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-                matches.forEach(match -> {
-                    String t = player + " vs " + match.getOpponent() + " (" + match.getDate() + ")";
-                    PdfDocument.Page p = pdfDocument.startPage(pageInfo);
-                    drawTitle(p, t);
-                    drawTable(p, setDataMatch(match.getMatchId()));
-                    pdfDocument.finishPage(p);
-                    try {
-                        pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-                    } catch (IOException e) {
-                        Log.e("generatePlayerPdfToEmail ", "inner exp catch: " + e);
-                    }
-                });
-                pdfDocument.close();
-            } catch (IOException e) {
-                Log.e("generatePlayerPdfToEmail ", "exp catch: " + e);
-            }
-            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);
-            String[] to = {"t.anti94@gmail.com"};
-            Intent intent = new ShareCompat.IntentBuilder(this)
-                    .setStream(uri)
-                    .getIntent()
-                    .setAction(Intent.ACTION_SENDTO)
-                    .setData(Uri.parse("mailto:"))
-                    .putExtra(Intent.EXTRA_EMAIL, to)
-                    .putExtra("fileName", fileName)
-                    .putExtra(Intent.EXTRA_SUBJECT, playerServices.findPlayerById(playerId).toString())
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(intent);
-        }
-    }
-
-    private void generateMatchPdfToEmail() {
-        Player player = playerServices.findPlayerById(playerId);
-        Match match = matchServices.findMatchById(matchId);
-        PdfDocument pdfDocument = new PdfDocument();
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-        String fileName = player.getFileName() + "_vs_" +
-                match.getOpponent().trim() + "_" +
-                System.currentTimeMillis() + ".pdf";
-        File externalDir = new File(getFilesDir().getAbsolutePath());
-        File file = new File(externalDir, fileName);
-        try {
-            PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-            drawTitle(page, player + " vs " + match.getOpponent() + "(" + match.getDate() + ")");
-            drawTable(page, setDataMatch(match.getMatchId()));
-            pdfDocument.finishPage(page);
-            pdfDocument.writeTo(Files.newOutputStream(file.toPath()));
-        } catch (IOException e) {
-            Log.e("generateMatchPdfToEmail", "exp catch: " + e);
-        }
-        pdfDocument.close();
-        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);
-        String[] to = {"t.anti94@gmail.com"};
-        Intent intent = new ShareCompat.IntentBuilder(this)
-                .setStream(uri)
-                .getIntent()
-                .setAction(Intent.ACTION_SENDTO)
-                .setData(Uri.parse("mailto:"))
-                .putExtra(Intent.EXTRA_EMAIL, to)
-                .putExtra("fileName", fileName)
-                .putExtra(Intent.EXTRA_SUBJECT, playerServices.findPlayerById(playerId).toString())
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(intent);
-    }
-
-    private void drawTitle(PdfDocument.Page page, String title) {
-        Paint titlePaint = new Paint();
-        titlePaint.setColor(Color.BLACK);
-        titlePaint.setTextSize(16);
-        titlePaint.setFakeBoldText(true);
-        float pageWidth = page.getInfo().getPageWidth();
-        float x = pageWidth / 2 - titlePaint.measureText(title) / 2;
-        float y = 30;
-        page.getCanvas().drawText(title, x, y, titlePaint);
-    }
-
-    private void drawTable(PdfDocument.Page page, String[][] tableData) {
-        int tableRows = 13;
-        int tableCols = 4;
-        float cellWidth = page.getInfo().getPageWidth() / 2f / tableCols;
-        float cellHeight = page.getInfo().getPageHeight() / 2f / tableRows;
-        for (int row = 0; row < tableRows; row++) {
-            for (int col = 0; col < tableCols; col++) {
-                float left = col * cellWidth + page.getInfo().getPageWidth() / 2f - 2 * cellWidth;
-                float top = row * cellHeight + 55;
-                float right = left + cellWidth;
-                float bottom = top + cellHeight;
-                Paint cellPaint = new Paint();
-                cellPaint.setColor(Color.BLACK);
-                cellPaint.setStyle(Paint.Style.STROKE);
-                cellPaint.setStrokeWidth(1);
-                page.getCanvas().drawRect(left, top, right, bottom, cellPaint);
-                String text = tableData[row][col];
-                Paint textPaint = new Paint();
-                float x = left + (cellWidth - textPaint.measureText(text)) / 2;
-                float y = top + cellHeight / 2 - ((textPaint.descent() + textPaint.ascent()) / 2);
-                textPaint.setColor(Color.BLACK);
-                textPaint.setTextSize(12);
-                page.getCanvas().drawText(text, x, y, textPaint);
-            }
-        }
-    }
-
-    private String[][] setDataPlayer(long playerId) {
-        NumberFormat formatter = new DecimalFormat("#0.0");
-        long save, goal;
-        double efficiency;
-        String[][] rv = new String[][]{
-                {getString(R.string.position), getString(R.string.save), getString(R.string.goal), getString(R.string.summary)},
-                {getString(R.string.leftWing), "", "", ""},
-                {getString(R.string.leftBack), "", "", ""},
-                {getString(R.string.centralBack), "", "", ""},
-                {getString(R.string.rightBack), "", "", ""},
-                {getString(R.string.rightWing), "", "", ""},
-                {getString(R.string.pivot), "", "", ""},
-                {getString(R.string.breakIn), "", "", ""},
-                {getString(R.string.fastBreak), "", "", ""},
-                {getString(R.string.sevenMeters), "", "", ""},
-                {getString(R.string.summary), "", "", ""},
-                {getString(R.string.yellowCard), getString(R.string.twoMinutes), getString(R.string.redCard), getString(R.string.blueCard),},
-                {"", "", "", ""}
-        };
-        for (int i = 0; i < eventTypes.length; i++) {
-            save = playerServices.findAllSaveByPlayerByType(playerId, eventTypes[i]);
-            goal = playerServices.findAllGoalByPlayerByType(playerId, eventTypes[i]);
-            efficiency = (double) save / (goal + save) * 100;
-            rv[i + 1][1] = String.valueOf(save);
-            rv[i + 1][2] = String.valueOf(goal);
-            rv[i + 1][3] = formatter.format(efficiency) + "%";
-        }
-        save = playerServices.findAllSaveByPlayer(playerId);
-        goal = playerServices.findAllGoalByPlayer(playerId);
-        efficiency = (double) save / (goal + save) * 100;
-        rv[10][1] = String.valueOf(save);
-        rv[10][2] = String.valueOf(goal);
-        rv[10][3] = formatter.format(efficiency) + "%";
-        rv[12][0] = playerServices.findAllYellowCardByPlayer(playerId) + " db";
-        rv[12][1] = playerServices.findAllTwoMinutesByPlayer(playerId) + " db";
-        rv[12][2] = playerServices.findAllRedCardByPlayer(playerId) + " db";
-        rv[12][3] = playerServices.findAllBlueCardByPlayer(playerId) + " db";
-        return rv;
-    }
-
-    private String[][] setDataMatch(long matchId) {
-        NumberFormat formatter = new DecimalFormat("#0.0");
-        long save, goal;
-        double efficiency;
-        String[][] rv = new String[][]{
-                {getString(R.string.position), getString(R.string.save), getString(R.string.goal), getString(R.string.summary)},
-                {getString(R.string.leftWing), "", "", ""},
-                {getString(R.string.leftBack), "", "", ""},
-                {getString(R.string.centralBack), "", "", ""},
-                {getString(R.string.rightBack), "", "", ""},
-                {getString(R.string.rightWing), "", "", ""},
-                {getString(R.string.pivot), "", "", ""},
-                {getString(R.string.breakIn), "", "", ""},
-                {getString(R.string.fastBreak), "", "", ""},
-                {getString(R.string.sevenMeters), "", "", ""},
-                {getString(R.string.summary), "", "", ""},
-                {getString(R.string.yellowCard), getString(R.string.twoMinutes), getString(R.string.redCard), getString(R.string.blueCard),},
-                {"", "", "", ""}
-        };
-        for (int i = 0; i < eventTypes.length; i++) {
-            save = matchServices.findAllSaveByMatchByType(matchId, eventTypes[i]);
-            goal = matchServices.findAllGoalByMatchByType(matchId, eventTypes[i]);
-            efficiency = (double) save / (goal + save) * 100;
-            rv[i + 1][1] = String.valueOf(save);
-            rv[i + 1][2] = String.valueOf(goal);
-            rv[i + 1][3] = formatter.format(efficiency) + "%";
-        }
-        save = matchServices.findAllSaveByMatch(matchId);
-        goal = matchServices.findAllGoalByMatch(matchId);
-        efficiency = (double) save / (goal + save) * 100;
-        rv[10][1] = String.valueOf(save);
-        rv[10][2] = String.valueOf(goal);
-        rv[10][3] = formatter.format(efficiency) + "%";
-        rv[12][0] = matchServices.findAllYellowCardByMatch(matchId) + " db";
-        rv[12][1] = matchServices.findAllTwoMinutesByMatch(matchId) + " db";
-        rv[12][2] = matchServices.findAllRedCardByMatch(matchId) + " db";
-        rv[12][3] = matchServices.findAllBlueCardByMatch(matchId) + " db";
-        return rv;
     }
 }
