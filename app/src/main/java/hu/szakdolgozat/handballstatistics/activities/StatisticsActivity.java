@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -54,7 +53,6 @@ public class StatisticsActivity extends AppCompatActivity {
                                     impExpService.generateMatchJson();
                                     break;
                             }
-                            Log.d("TAG", "onActivityResult: Manage External Storage Permissions Granted");
                         } else {
                             Toast.makeText(StatisticsActivity.this, "Hozzáférés megtagadva", Toast.LENGTH_SHORT).show();
                         }
@@ -81,7 +79,6 @@ public class StatisticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
         init();
-        Log.e("TAG", Environment.isExternalStorageManager() + "");
         if (Objects.equals(methodType, "player")) {
             loadPlayerStatistics(playerId);
             exportPlayer();
@@ -308,7 +305,8 @@ public class StatisticsActivity extends AppCompatActivity {
                 if (file != null) {
                     sendPdfInEmail(file);
                 } else {
-                    Toast.makeText(this, "Hiba a fájl csatolásánál!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Hiba a fájl csatolásánál!",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -360,18 +358,11 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void requestPermission() {
-
-        try {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
-            intent.setData(uri);
-            storageActivityResultLauncher.launch(intent);
-        } catch (Exception e) {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-            storageActivityResultLauncher.launch(intent);
-        }
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+        Uri uri = Uri.fromParts("package", this.getPackageName(), null);
+        intent.setData(uri);
+        storageActivityResultLauncher.launch(intent);
     }
 
     private boolean checkPermission() {

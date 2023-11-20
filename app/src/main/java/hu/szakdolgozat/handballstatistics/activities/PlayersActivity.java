@@ -162,7 +162,7 @@ public class PlayersActivity extends AppCompatActivity implements RecyclerViewIn
 
     @Override
     public void onItemLongClick(int position) {
-        new android.app.AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.removeTitle)
                 .setMessage(R.string.removePlayer)
                 .setIcon(R.drawable.baseline_delete_24)

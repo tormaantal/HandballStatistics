@@ -37,9 +37,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             MATCHES_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             MATCHES_COLUMN_PLAYER_ID + " INTEGER, " +
             MATCHES_COLUMN_DATE + " TEXT," +
-            MATCHES_COLUMN_OPPONENT + " INTEGER, " +
+            MATCHES_COLUMN_OPPONENT + " TEXT, " +
             "FOREIGN KEY (" + MATCHES_COLUMN_PLAYER_ID + ") REFERENCES " + PLAYERS_TABLE_NAME + "(" + PLAYERS_COLUMN_ID + "));";
-
 
     private static final String EVENTS_TABLE_NAME = "events";
     private static final String EVENTS_COLUMN_ID = "eventId";
@@ -156,7 +155,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         Match match = null;
         if (cursor.moveToFirst()) {
-            match = new Match(cursor.getLong(0), cursor.getLong(1), cursor.getString(2), cursor.getString(3));
+            match = new Match(cursor.getLong(0), cursor.getLong(1),
+                    cursor.getString(2), cursor.getString(3));
         }
         cursor.close();
         return match;
@@ -458,8 +458,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
-                returnList.add(new Event(cursor.getLong(0), cursor.getLong(1), cursor.getString(2),
-                        stringToType(cursor.getString(3)),cursor.getInt(4)));
+                returnList.add(new Event(cursor.getLong(0), cursor.getLong(1),
+                        cursor.getString(2), stringToType(cursor.getString(3)), cursor.getInt(4)));
             } while (cursor.moveToNext());
         }
         cursor.close();

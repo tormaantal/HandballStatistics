@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,6 +19,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.JsonSyntaxException;
 
 import hu.szakdolgozat.handballstatistics.R;
 import hu.szakdolgozat.handballstatistics.RecyclerViewInterface;
@@ -40,7 +41,11 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
                         if (uri != null) {
                             assert uri.getPath() != null;
                             String fileName = uri.getPath().substring(uri.getPath().lastIndexOf("/") + 1);
-                            impExpService.readJsonFile(fileName);
+                            try {
+                                impExpService.readJsonFile(fileName);
+                            } catch (JsonSyntaxException e) {
+                                Toast.makeText(this, "Nem megfelelő a JSON fájl!", Toast.LENGTH_SHORT).show();
+                            }
                             recreate();
                         }
                     }
@@ -59,9 +64,8 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
                             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS));
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             startPickJson.launch(intent);
-                            Log.d("TAG", "onActivityResult: Manage External Storage Permissions Granted");
                         } else {
-                            Toast.makeText(MatchesActivity.this, "Storage Permissions Denied", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MatchesActivity.this, "Hozzáférés megtagadva!", Toast.LENGTH_SHORT).show();
                         }
                     });
     private TextView tvNewMatch, tvPlayers, tvContact;
@@ -121,17 +125,11 @@ public class MatchesActivity extends AppCompatActivity implements RecyclerViewIn
     }
 
     private void requestPermission() {
-        try {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
-            intent.setData(uri);
-            storageActivityResultLauncher.launch(intent);
-        } catch (Exception e) {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-            storageActivityResultLauncher.launch(intent);
-        }
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+        Uri uri = Uri.fromParts("package",this.getPackageName(), null);
+        intent.setData(uri);
+        storageActivityResultLauncher.launch(intent);
     }
 
     private boolean checkPermission() {
