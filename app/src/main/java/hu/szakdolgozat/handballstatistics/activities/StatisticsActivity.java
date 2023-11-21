@@ -345,13 +345,11 @@ public class StatisticsActivity extends AppCompatActivity {
 
     private void sendPdfInEmail(File file) {
         Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".file.provider", file);
-        String[] to = {"t.anti94@gmail.com"};
         Intent intent = new ShareCompat.IntentBuilder(this)
                 .setStream(uri)
                 .getIntent()
                 .setAction(Intent.ACTION_SENDTO)
                 .setData(Uri.parse("mailto:"))
-                .putExtra(Intent.EXTRA_EMAIL, to)
                 .putExtra(Intent.EXTRA_SUBJECT, playerServices.findPlayerById(playerId).toString())
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(intent);
